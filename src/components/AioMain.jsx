@@ -88,6 +88,7 @@ const AioMain = () => {
                     width: '90%',
                     maxWidth: 640,
                     marginX: 4,
+                    marginY: 2,
                     bgcolor: 'background.paper',
                     border: '1px dashed grey'
                 }}

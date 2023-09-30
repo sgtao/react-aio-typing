@@ -7,6 +7,8 @@ import ReactAudioPlayer from 'react-audio-player';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 
+import TypingContent from './TypingContent';
+
 // eslint-disable-next-line react/prop-types
 const AioTyping = ({ contents = {} }) => {
     let [itemIndex, setItemIndex] = useState(0);
@@ -107,6 +109,7 @@ const AioTyping = ({ contents = {} }) => {
                 width: '90%',
                 maxWidth: 640,
                 marginX: 4,
+                marginY: 2,
                 bgcolor: 'background.paper'
             }}
         >
@@ -117,12 +120,7 @@ const AioTyping = ({ contents = {} }) => {
                 [SPACE]=(再生), [Tab]=(訳語切替), [右Key]=(次へ), [左Key]=(前へ)
             </Typography>
 
-            <Box mt={2} fontWeight={"bold"} >
-                原文（タイピング対象）：
-            </Box>
-            <Typography variant="h6" gutterBottom>
-                {englishText}
-            </Typography>
+            <TypingContent typingText={englishText} />
 
             <Box mt={2} fontWeight={"bold"} >
                 訳文（{(typeSlashed) ? "語順訳" : "和訳"}）：
