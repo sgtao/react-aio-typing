@@ -1,6 +1,8 @@
 # react-aio-typing
+## 概要
+- GitHub aio-typingをReact版に変更する
 
-## React + Vite
+## created by React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -51,6 +53,7 @@ firebase deploy
 npm install @mui/material @emotion/react @emotion/styled -D
 npm install @fontsource/roboto -D
 npm install @mui/icons-material -D
+# ... 
 ```
 
 ### Implement Login Screen
