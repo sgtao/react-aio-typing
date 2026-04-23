@@ -1,0 +1,48 @@
+body {
+  padding-top: 40px;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  background-color: #c2e8fa;
+}
+
+.game-container {
+  width: 80%;
+  margin: 0 auto;
+  background-color: white;
+  padding: 1em;
+  border-radius: 0.5em;
+}
+
+.category-index > div {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.category-index > div > .category,
+.category-index > div > .index {
+  border-radius: 0.5em;
+  padding: 0.5em;
+}
+
+.category-index > div > .category {
+  background-color: #faf6c2;
+}
+
+.category-index > div > .index {
+  background-color: #c2fad7;
+}
+
+.instruction {
+  font-size: 16px;
+  font-weight: bold;
+  color: red;
+}
+
+.target-word {
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  text-overflow: clip;
+  overflow-wrap: break-word;
+}

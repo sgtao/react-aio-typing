@@ -1,4 +1,4 @@
-# aio-typing
+# react-aio-typing
 
 ## 概要
 - 書籍『ALL IN ONE』のタイピング学習のレベルが高いので、易しいコンテンツを作成したい
