@@ -1,87 +1,41 @@
-# Welcome to React Router!
+# aio-typing
 
-A modern, production-ready template for building full-stack React applications using React Router.
+## 概要
+- 書籍『ALL IN ONE』のタイピング学習のレベルが高いので、易しいコンテンツを作成したい
+  * フルスペックのソフトは、Linkage Club『[ALL IN ONE](https://linkage-club.net/books#all)』の書籍を参考にしてみてください
+   + ALL IN ONE『[英語独学支援サイト](https://www.aio-english.net/)』
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+### 詳細
+- コンテンツの利用方法（操作方法）
+#### 利用方法
+- [demo site](https://sgtao.github.io/aio-typing/index.html)
 
-## Features
+##### 01．トップメニュー
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+| キー | 機能 | 備考 |
+| ---- | ---- | ---- |
+| Enter | スタート | タイピングをスタート |
 
-## Getting Started
 
-### Installation
+##### 02．タイピング中（スタート後）
 
-Install the dependencies:
+| キー | 機能 | 備考 |
+| ---- | ---- | ---- |
+| `0-9a-z` | タイピング | 正解すると文字が消えていく |
+| Space | 音声再生 | 先頭から再生 |
+| Enter | 次の文へ | 次問題へ |
+| Esc. | メニューへ戻る |   |
 
-```bash
-npm install
-```
 
-### Development
+##### スナップショット
 
-Start the development server with HMR:
+| 01．トップメニュー | 02．タイピング中 |
+| ----- | ----- |
+| ![image](./images/011_snapshotTopMenu.png) | ![image](./images/012_snapshotTypingContents.png) |
 
-```bash
-npm run dev
-```
 
-Your application will be available at `http://localhost:5173`.
+## 参考情報
+- タイピングゲームは、ドットインストール『[JavaScriptでタイピングゲームを作ろう](https://dotinstall.com/lessons/typing_js_v4)』を参考にしました
 
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+## LICENSE
+- MIT LICENSE
