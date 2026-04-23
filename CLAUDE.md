@@ -24,16 +24,15 @@ app/
 ├── routes/home.tsx              # エントリ（TypingGame をレンダリングするだけ）
 ├── components/
 │   ├── TypingGame.tsx           # オーケストレーター
-│   ├── MenuScreen.tsx           # メニュー画面（設定パネル含む）
+│   ├── MenuScreen.tsx           # メニュー画面（カテゴリ選択・設定パネル含む）
 │   ├── PlayingScreen.tsx        # タイピング中画面
 │   ├── ResultScreen.tsx         # 1文完了後の結果画面
 │   └── LiveStats.tsx            # WPM・正確性・経過時間のリアルタイム表示
 ├── hooks/
 │   ├── useGameState.ts          # ゲーム状態マシン（画面遷移・音声制御）
-│   ├── useTypingEngine.ts       # タイピングエンジン（WPM/正確性・入力判定）
 │   └── useSettings.ts           # localStorage 設定管理
 └── services/
-    ├── resourceLoader.ts        # JSON fetch・型変換
+    ├── csvLoader.ts             # CSV fetch・パース・カテゴリ抽出（メインデータソース）
     └── typingEngine.ts          # TypingEngine クラス（純粋ロジック・React 非依存）
 ```
 
@@ -62,42 +61,41 @@ app/
 
 | キー | 型 | デフォルト | 説明 |
 |------|----|-----------|------|
+| `category` | `string \| null` | `null` | 選択中のカテゴリ（null = 未選択） |
+| `order` | `'random' \| 'sequential'` | `'random'` | 出題順 |
 | `mode` | `'typing' \| 'composition'` | `'typing'` | ゲームモード |
 | `mistypeMode` | `'strict' \| 'free'` | `'free'` | ミスタイプの扱い |
 | `caseInsensitive` | `boolean` | `true` | 大文字・小文字を区別しない |
 | `translation` | `'slashed' \| 'natural'` | `'slashed'` | 表示する訳のスタイル |
 | `hintLevel` | `1 \| 2 \| 3` | `1` | 英作文モードのヒントレベル |
 
+`sequentialIndex`（順番再生の現在位置）はセッション内のみ保持し、localStorage には保存しない。リロードで先頭に戻る。
+
 ### Content data format
 
-`public/assets-sample.json` から読み込む（パスは `TypingGame.tsx` に定数として定義）。
-`translation.natural` は英作文モードおよび Tab キーによる訳切り替え時に使用する。
+`public/allinone-text-contents.csv` を `csvLoader.ts` が起動時に1回だけ fetch してメモリにキャッシュする。全418文・20カテゴリを含む。
 
-```json
-{
-  "category": "01_時制",
-  "contents": [
-    {
-      "index": "idx001",
-      "englishText": "The sentence to type.",
-      "translation": {
-        "slashed": "スラッシュリーディング訳",
-        "natural": "自然な和訳"
-      }
-    }
-  ]
-}
-```
+| カラム | 説明 | 例 |
+|--------|------|----|
+| `no` | 通し番号 | `1` |
+| `index` | 表示用インデックス | `[001]` |
+| `category` | カテゴリ名 | `01_時制` |
+| `category_index` | カテゴリ番号 | `[01]` |
+| `englishText` | タイピング対象の英文 | `He grinned...` |
+| `translation_slashed` | スラッシュ訳 | `彼はにっこり笑った／...` |
+| `translation_natural` | 自然な和訳 | `彼はにっこり笑って...` |
+
+`csvLoader.getCategories()` でカテゴリ一覧を取得し、`csvLoader.getByCategory(cat)` で出題文を取得する。
 
 ### Audio file convention
 
-音声ファイルは `public/audio/` に置き、`idx` プレフィックスを除いた番号 + `.mp3` で命名する。
-例: `idx001` → `audio/001.mp3`。ファイルの存在確認は HEAD リクエストで行う。
-音声の再生・一時停止は Enter キーで操作する（旧実装の Space キーから変更）。
+音声ファイルは `public/audio/` に置き、`index` カラムの `[` と `]` を除いた番号 + `.mp3` で命名する。
+例: `[001]` → `audio/001.mp3`。ファイルの存在確認は HEAD リクエストで行う。
+音声の再生・一時停止は Enter キーで操作する。
 
 ## Game state machine
 
-- **Menu state**: Click または Enter でゲーム開始。設定パネルでモード・ヒントレベル等を変更できる。
+- **Menu state**: カテゴリを選択し Enter でゲーム開始。設定パネルでカテゴリ・出題順・モード等を変更できる。カテゴリ未選択状態では START ボタンが無効。
 - **Playing state**: TypingEngine がキー入力を処理する。非英数字は自動スキップ。200ms ごとに WPM・正確性・経過時間をライブ更新する。
   - **strict モード**: 誤キーで入力がブロックされる
   - **free モード**: 誤キーも受け付け、Backspace で修正できる
