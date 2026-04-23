@@ -13,6 +13,8 @@ body {
   border-radius: 0.5em;
 }
 
+/* ---- category / index ---- */
+
 .category-index > div {
   display: flex;
   align-items: center;
@@ -34,15 +36,164 @@ body {
   background-color: #c2fad7;
 }
 
+/* ---- text areas ---- */
+
 .instruction {
   font-size: 16px;
   font-weight: bold;
   color: red;
 }
 
+.hint-text {
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  overflow-wrap: break-word;
+  background-color: #f0f8ff;
+  border-radius: 0.3em;
+  padding: 0.5em;
+  margin: 0.5em 0;
+}
+
+.translate-text {
+  font-size: 14px;
+  color: #555;
+  margin: 0.3em 0 0.6em;
+}
+
+.translate-label {
+  font-weight: bold;
+  margin-right: 0.4em;
+  color: #888;
+}
+
+/* ---- typing display ---- */
+
 .target-word {
   font-size: 24px;
   letter-spacing: 0.1em;
   text-overflow: clip;
   overflow-wrap: break-word;
+  line-height: 1.6;
+}
+
+.char-correct  { color: #2a9d2a; }
+.char-wrong    { color: #cc3030; background-color: #ffe8e8; }
+.char-cursor   { border-bottom: 3px solid #333; }
+.char-pending  { color: #999; }
+.char-auto     { color: #bbb; }
+
+/* ---- live stats ---- */
+
+.live-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+  margin: 0.8em 0;
+  font-size: 14px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+/* ---- result screen ---- */
+
+.result-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2.5em;
+  margin: 1em 0;
+}
+
+.result-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.result-stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2a2a2a;
+}
+
+.result-stat-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.result-highlight {
+  margin-top: 1em;
+}
+
+/* ---- settings panel ---- */
+
+.settings-panel {
+  border: 1px solid #ddd;
+  border-radius: 0.5em;
+  padding: 0.8em 1em;
+  margin: 0.8em auto;
+  max-width: 480px;
+  text-align: left;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5em 0;
+  gap: 0.5em;
+}
+
+.settings-label {
+  font-size: 13px;
+  color: #555;
+  min-width: 90px;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 3px 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  background-color: #c2e8fa;
+  border-color: #5ba3c9;
+  font-weight: bold;
+}
+
+/* ---- start button ---- */
+
+.start-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 0.5em 2em;
+  margin: 0.8em 0;
+  background-color: #c2fad7;
+  border: 2px solid #5ba37e;
+  border-radius: 0.5em;
+  cursor: pointer;
+}
+
+.start-btn:hover {
+  background-color: #a0f0c0;
 }

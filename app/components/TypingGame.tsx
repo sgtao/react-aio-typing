@@ -1,12 +1,15 @@
+import { useSettings } from '../hooks/useSettings';
 import { useGameState } from '../hooks/useGameState';
 import { MenuScreen } from './MenuScreen';
 import { PlayingScreen } from './PlayingScreen';
+import { ResultScreen } from './ResultScreen';
 import '../styles/game.css';
 
 const ASSET_FILE = '/assets-sample.json';
 
 export function TypingGame() {
-  const { display } = useGameState(ASSET_FILE);
+  const { settings, updateSettings } = useSettings();
+  const { display, startGame } = useGameState(ASSET_FILE, settings);
 
   return (
     <div className="game-container">
@@ -25,11 +28,15 @@ export function TypingGame() {
         </p>
       </header>
 
-      {display.phase === 'menu' ? (
-        <MenuScreen />
-      ) : (
-        <PlayingScreen display={display} />
+      {display.phase === 'menu' && (
+        <MenuScreen
+          settings={settings}
+          onUpdateSettings={updateSettings}
+          onStart={startGame}
+        />
       )}
+      {display.phase === 'playing' && <PlayingScreen display={display} />}
+      {display.phase === 'result' && <ResultScreen display={display} />}
 
       <footer>
         <p>

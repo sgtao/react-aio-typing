@@ -1,7 +1,8 @@
 export interface ContentItem {
   index: string;
   word: string;
-  translate: string;
+  translate: string;         // slashed translation
+  translateNatural: string;  // natural translation
 }
 
 export interface GameResource {
@@ -24,6 +25,7 @@ export async function loadResource(file: string): Promise<GameResource> {
       index: item.index,
       word: item.englishText,
       translate: item.translation.slashed,
+      translateNatural: item.translation.natural,
     })),
   };
 }
