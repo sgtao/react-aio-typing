@@ -194,6 +194,26 @@ body {
   cursor: pointer;
 }
 
-.start-btn:hover {
+.start-btn:hover:not(:disabled) {
   background-color: #a0f0c0;
+}
+
+.start-btn:disabled {
+  background-color: #e8e8e8;
+  border-color: #aaa;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* ---- category select ---- */
+
+.category-select {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 3px 6px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #f8f8f8;
+  cursor: pointer;
+  flex: 1;
 }

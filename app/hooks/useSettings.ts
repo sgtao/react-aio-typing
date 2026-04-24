@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
 
 export interface Settings {
+  category: string | null;
+  order: 'random' | 'sequential';
   mode: 'typing' | 'composition';
   mistypeMode: 'strict' | 'free';
   caseInsensitive: boolean;
@@ -11,6 +13,8 @@ export interface Settings {
 const STORAGE_KEY = 'aio_settings';
 
 const DEFAULTS: Settings = {
+  category: null,
+  order: 'random',
   mode: 'typing',
   mistypeMode: 'free',
   caseInsensitive: true,

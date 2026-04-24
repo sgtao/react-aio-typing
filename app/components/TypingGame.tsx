@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useSettings } from '../hooks/useSettings';
 import { useGameState } from '../hooks/useGameState';
 import { MenuScreen } from './MenuScreen';
@@ -5,11 +6,17 @@ import { PlayingScreen } from './PlayingScreen';
 import { ResultScreen } from './ResultScreen';
 import '../styles/game.css';
 
-const ASSET_FILE = '/assets-sample.json';
+const CSV_PATH = '/allinone-text-contents.csv';
 
 export function TypingGame() {
   const { settings, updateSettings } = useSettings();
-  const { display, startGame } = useGameState(ASSET_FILE, settings);
+  const { display, startGame } = useGameState(CSV_PATH, settings);
+
+  useEffect(() => {
+    if (display.categories.length > 0 && settings.category === null) {
+      updateSettings({ category: display.categories[0] });
+    }
+  }, [display.categories, settings.category, updateSettings]);
 
   return (
     <div className="game-container">
@@ -30,6 +37,7 @@ export function TypingGame() {
 
       {display.phase === 'menu' && (
         <MenuScreen
+          categories={display.categories}
           settings={settings}
           onUpdateSettings={updateSettings}
           onStart={startGame}

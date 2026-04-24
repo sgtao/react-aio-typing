@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { loadResource, checkFileExist } from '../services/resourceLoader';
-import type { ContentItem } from '../services/resourceLoader';
+import { csvLoader } from '../services/csvLoader';
+import type { Sentence } from '../services/csvLoader';
+import { checkFileExist } from '../services/resourceLoader';
 import { TypingEngine, generateHint, buildPendingMask } from '../services/typingEngine';
 import type { TypingResults, TypedChar } from '../services/typingEngine';
 import type { Settings } from './useSettings';
@@ -9,6 +10,7 @@ export type GamePhase = 'menu' | 'playing' | 'result';
 
 export interface GameDisplay {
   phase: GamePhase;
+  categories: string[];
   category: string;
   currentIndex: string;
   targetText: string;
@@ -26,6 +28,13 @@ export interface GameDisplay {
 
 export type { TypedChar };
 
+interface ContentItem {
+  index: string;
+  word: string;
+  translate: string;
+  translateNatural: string;
+}
+
 interface MutableState {
   phase: GamePhase;
   contents: ContentItem[];
@@ -37,9 +46,19 @@ interface MutableState {
   timerHandle: ReturnType<typeof setInterval> | null;
 }
 
-export function useGameState(assetFile: string, settings: Settings) {
+function sentenceToContent(s: Sentence): ContentItem {
+  return {
+    index: s.index,
+    word: s.englishText,
+    translate: s.translationSlashed,
+    translateNatural: s.translationNatural,
+  };
+}
+
+export function useGameState(csvPath: string, settings: Settings) {
   const [display, setDisplay] = useState<GameDisplay>({
     phase: 'menu',
+    categories: [],
     category: '',
     currentIndex: '',
     targetText: '',
@@ -67,12 +86,18 @@ export function useGameState(assetFile: string, settings: Settings) {
   });
 
   const audioMap = useRef<Map<string, HTMLAudioElement>>(new Map());
-  const assetFileRef = useRef(assetFile);
+  const csvPathRef = useRef(csvPath);
   const settingsRef = useRef(settings);
   const startGameFnRef = useRef<() => void>(() => {});
 
-  // Keep settingsRef always current without re-running the effect
   settingsRef.current = settings;
+
+  // Load CSV on mount and populate categories
+  useEffect(() => {
+    csvLoader.fetchAll(csvPathRef.current).then(() => {
+      setDisplay((prev) => ({ ...prev, categories: csvLoader.getCategories() }));
+    });
+  }, []);
 
   useEffect(() => {
     const s = stateRef.current;
@@ -99,10 +124,7 @@ export function useGameState(assetFile: string, settings: Settings) {
     }
 
     function stopAllAudio() {
-      audio.forEach((el) => {
-        el.pause();
-        el.currentTime = 0;
-      });
+      audio.forEach((el) => { el.pause(); el.currentTime = 0; });
     }
 
     function playAudioAuto(indexName: string) {
@@ -182,11 +204,7 @@ export function useGameState(assetFile: string, settings: Settings) {
       if (!s.currentContent) return;
       stopAudio(s.currentIndex);
       const cfg = settingsRef.current;
-      const engine = new TypingEngine(
-        s.currentContent.word,
-        cfg.mistypeMode,
-        cfg.caseInsensitive
-      );
+      const engine = new TypingEngine(s.currentContent.word, cfg.mistypeMode, cfg.caseInsensitive);
       s.engine = engine;
       s.phase = 'playing';
       const st = engine.getDisplayState();
@@ -212,8 +230,9 @@ export function useGameState(assetFile: string, settings: Settings) {
       stopAudio(s.currentIndex);
 
       const cfg = settingsRef.current;
-      const pos = Math.floor(Math.random() * s.contentsIndex.length);
-      const idx = s.contentsIndex.splice(pos, 1)[0];
+      // sequential: always take first; random: take from random position
+      const splicePos = cfg.order === 'sequential' ? 0 : Math.floor(Math.random() * s.contentsIndex.length);
+      const idx = s.contentsIndex.splice(splicePos, 1)[0];
       const content = s.contents[idx];
       const translationMode = cfg.translation;
       const hintText = computeHintText(content);
@@ -252,20 +271,25 @@ export function useGameState(assetFile: string, settings: Settings) {
     }
 
     async function startGame() {
-      const resource = await loadResource(assetFileRef.current);
-      s.contents = resource.contents;
-      s.contentsIndex = resource.contents.map((_, i) => i);
+      const cfg = settingsRef.current;
+      if (!cfg.category) return;
 
+      const sentences = csvLoader.getByCategory(cfg.category);
+      s.contents = sentences.map(sentenceToContent);
+      s.contentsIndex = s.contents.map((_, i) => i);
+
+      // Load audio files
       audio.forEach((el) => el.pause());
       audio.clear();
-      for (const content of resource.contents) {
-        const audioName = `${content.index.replace('idx', '')}.mp3`;
+      for (const content of s.contents) {
+        // "[001]" → "001.mp3"
+        const audioName = `${content.index.replace(/[\[\]]/g, '')}.mp3`;
         const audioPath = `audio/${audioName}`;
         const exists = await checkFileExist(audioPath);
         if (exists) audio.set(content.index, new Audio(audioPath));
       }
 
-      setDisplay((prev) => ({ ...prev, category: resource.category }));
+      setDisplay((prev) => ({ ...prev, category: cfg.category! }));
       setTimeout(() => nextContent(), 50);
     }
 
@@ -279,7 +303,7 @@ export function useGameState(assetFile: string, settings: Settings) {
       const phase = s.phase;
 
       if (phase === 'menu') {
-        if (e.key === 'Enter') startGameFnRef.current();
+        if (e.key === 'Enter' && settingsRef.current.category) startGameFnRef.current();
         return;
       }
 
@@ -290,16 +314,8 @@ export function useGameState(assetFile: string, settings: Settings) {
       }
 
       // playing
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        resetCurrentContent();
-        return;
-      }
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        toggleAudio();
-        return;
-      }
+      if (e.key === 'Escape') { e.preventDefault(); resetCurrentContent(); return; }
+      if (e.key === 'Enter') { e.preventDefault(); toggleAudio(); return; }
       if (e.key === 'Tab') {
         e.preventDefault();
         const newMode = s.translationMode === 'slashed' ? 'natural' : 'slashed';
@@ -316,20 +332,15 @@ export function useGameState(assetFile: string, settings: Settings) {
 
       const result = s.engine.handleKey(e.key);
       if (!result || result.ignored) return;
-      if (result.blocked) return; // strict mode wrong key — no visual shake for now
+      if (result.blocked) return;
 
       const st = s.engine.getDisplayState();
-      setDisplay((prev) => ({
-        ...prev,
-        typed: st.typed,
-        enginePosition: st.position,
-      }));
+      setDisplay((prev) => ({ ...prev, typed: st.typed, enginePosition: st.position }));
 
       if (result.complete) showResult();
     }
 
     document.addEventListener('keydown', handleKeyDown);
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       stopStatsTimer();

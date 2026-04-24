@@ -1,6 +1,7 @@
 import type { Settings } from '../hooks/useSettings';
 
 interface Props {
+  categories: string[];
   settings: Settings;
   onUpdateSettings: (partial: Partial<Settings>) => void;
   onStart: () => void;
@@ -40,12 +41,36 @@ function ToggleGroup<T extends string | number | boolean>({
   );
 }
 
-export function MenuScreen({ settings, onUpdateSettings, onStart }: Props) {
+export function MenuScreen({ categories, settings, onUpdateSettings, onStart }: Props) {
   return (
     <>
       <p className="instruction">設定を選んでスタートしてください</p>
 
       <div className="settings-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="settings-row">
+          <span className="settings-label">カテゴリ</span>
+          <select
+            className="category-select"
+            value={settings.category ?? ''}
+            onChange={(e) => onUpdateSettings({ category: e.target.value || null })}
+          >
+            {categories.length === 0 && <option value="">読み込み中...</option>}
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
+        <ToggleGroup
+          label="出題順"
+          options={[
+            { value: 'random' as const, label: 'ランダム' },
+            { value: 'sequential' as const, label: '順番' },
+          ]}
+          value={settings.order}
+          onChange={(v) => onUpdateSettings({ order: v })}
+        />
+
         <ToggleGroup
           label="モード"
           options={[
@@ -92,6 +117,7 @@ export function MenuScreen({ settings, onUpdateSettings, onStart }: Props) {
 
       <button
         className="start-btn"
+        disabled={!settings.category}
         onClick={(e) => {
           e.stopPropagation();
           onStart();
