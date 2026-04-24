@@ -76,7 +76,7 @@ export class TypingEngine {
   }
 
   start(): void {
-    if (!this.startTime) this.startTime = Date.now();
+    if (this.startTime === null) this.startTime = Date.now();
   }
 
   handleKey(key: string): HandleKeyResult {
@@ -127,8 +127,8 @@ export class TypingEngine {
   }
 
   getElapsed(): number {
-    if (!this.startTime) return 0;
-    return (this.endTime || Date.now()) - this.startTime;
+    if (this.startTime === null) return 0;
+    return (this.endTime ?? Date.now()) - this.startTime;
   }
 
   getWPM(): number {
