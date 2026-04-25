@@ -40,7 +40,7 @@
 - Create: `vitest.config.ts`
 - Create: `app/test-setup.ts`
 
-- [ ] **Step 1: Firebase と testing ライブラリをインストール**
+- [x] **Step 1: Firebase と testing ライブラリをインストール**
 
 ```bash
 cd /path/to/project
@@ -50,7 +50,7 @@ npm install --save-dev @testing-library/react @testing-library/jest-dom @testing
 
 期待出力: `added N packages` というメッセージが表示される。エラーなし。
 
-- [ ] **Step 2: `react-router.config.ts` を SPA モードに変更**
+- [x] **Step 2: `react-router.config.ts` を SPA モードに変更**
 
 ```typescript
 // react-router.config.ts
@@ -61,7 +61,7 @@ export default {
 } satisfies Config;
 ```
 
-- [ ] **Step 3: `vitest.config.ts` を作成（React コンポーネントテスト用）**
+- [x] **Step 3: `vitest.config.ts` を作成（React コンポーネントテスト用）**
 
 ```typescript
 // vitest.config.ts
@@ -78,7 +78,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 4: `app/test-setup.ts` を作成**
+- [x] **Step 4: `app/test-setup.ts` を作成**
 
 ```typescript
 // app/test-setup.ts
