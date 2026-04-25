@@ -94,9 +94,13 @@ export function useGameState(csvPath: string, settings: Settings) {
 
   // Load CSV on mount and populate categories
   useEffect(() => {
-    csvLoader.fetchAll(csvPathRef.current).then(() => {
-      setDisplay((prev) => ({ ...prev, categories: csvLoader.getCategories() }));
-    });
+    csvLoader.fetchAll(csvPathRef.current)
+      .then(() => {
+        setDisplay((prev) => ({ ...prev, categories: csvLoader.getCategories() }));
+      })
+      .catch((err) => {
+        console.error('CSV load failed:', err);
+      });
   }, []);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface Settings {
   category: string | null;
@@ -40,7 +40,11 @@ function persistSettings(settings: Settings): void {
 }
 
 export function useSettings() {
-  const [settings, setSettings] = useState<Settings>(loadSettings);
+  const [settings, setSettings] = useState<Settings>({ ...DEFAULTS });
+
+  useEffect(() => {
+    setSettings(loadSettings());
+  }, []);
 
   const updateSettings = useCallback((partial: Partial<Settings>) => {
     setSettings((prev) => {
