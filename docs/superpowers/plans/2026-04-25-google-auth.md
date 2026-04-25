@@ -298,7 +298,7 @@ npm test -- ProtectedRoute.test.tsx
 Test Files  1 passed
 ```
 
-- [ ] **Step 5: コミット**
+- [x] **Step 5: コミット**
 
 ```bash
 git add app/components/ProtectedRoute.tsx app/components/__tests__/ProtectedRoute.test.tsx
@@ -312,7 +312,7 @@ git commit -m "feat: add ProtectedRoute with loading/auth guard (TDD)"
 **Files:**
 - Create: `app/components/LoginScreen.tsx`
 
-- [ ] **Step 1: `app/components/LoginScreen.tsx` を作成**
+- [x] **Step 1: `app/components/LoginScreen.tsx` を作成**
 
 ```tsx
 // app/components/LoginScreen.tsx
@@ -347,13 +347,13 @@ export function LoginScreen() {
 
 注意: `signInWithGoogle()` が成功すると `onAuthStateChanged` が発火し、`AuthContext` の `user` が更新される。ナビゲーションは `login.tsx` ルート（Task 5）側の `useEffect` が担う。
 
-- [ ] **Step 2: 型チェック**
+- [x] **Step 2: 型チェック**
 
 ```bash
 npm run typecheck
 ```
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add app/components/LoginScreen.tsx
