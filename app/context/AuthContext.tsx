@@ -17,8 +17,10 @@ const firebaseConfig = {
   appId:      import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
+function getFirebaseAuth() {
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  return getAuth(app);
+}
 
 interface AuthContextValue {
   user: User | null;
@@ -34,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
     });
@@ -43,11 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithPopup(getFirebaseAuth(), provider);
   };
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
+    await firebaseSignOut(getFirebaseAuth());
   };
 
   return (

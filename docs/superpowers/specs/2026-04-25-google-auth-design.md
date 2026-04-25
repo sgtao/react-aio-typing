@@ -63,6 +63,9 @@ interface AuthContextValue {
 
 ### Firebase 初期化
 
+Firebase の初期化はモジュールレベルではなく関数内で遅延実行する。
+`react-router dev` が Node.js 環境でモジュールを読み込む際に Firebase のブラウザ API（IndexedDB 等）が存在せずエラーになるため。
+
 ```typescript
 const firebaseConfig = {
   apiKey:      import.meta.env.VITE_FIREBASE_API_KEY,
@@ -70,7 +73,15 @@ const firebaseConfig = {
   projectId:   import.meta.env.VITE_FIREBASE_PROJECT_ID,
   appId:       import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+function getFirebaseAuth() {
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  return getAuth(app);
+}
 ```
+
+`getApps().length === 0` のチェックで Firebase は1回だけ初期化される。
+`useEffect` やイベントハンドラから `getFirebaseAuth()` を呼ぶことで、ブラウザ環境でのみ実行される。
 
 ## ファイル変更一覧
 
@@ -85,10 +96,10 @@ const firebaseConfig = {
 | `app/routes/play.tsx` | **変更** | ProtectedRoute でラップ |
 | `app/routes.ts` | **変更** | `/` → login.tsx、`/menu` 追加 |
 | `app/root.tsx` | **変更** | AuthProvider を GameProvider の外側に追加 |
-| `react-router.config.ts` | **新規** | `ssr: false` で SPA モード |
+| `react-router.config.ts` | **変更** | `ssr: true` → `ssr: false` で SPA モードに変更（既存ファイル） |
 | `public/404.html` | **新規** | GitHub Pages の SPA ルーティング対応 |
 | `.env` | **新規（gitignore）** | Firebase 設定値（ローカル開発用） |
-| `.gitignore` | **変更** | `.env` を追加 |
+| `.gitignore` | **変更なし** | `.env` は実装前から既に除外済み |
 
 ## 環境変数
 

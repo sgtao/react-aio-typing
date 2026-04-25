@@ -693,7 +693,7 @@ git commit -m "feat: wrap play route with ProtectedRoute, fix redirect to /menu"
 **Files:**
 - Create: `public/404.html`
 
-- [ ] **Step 1: `public/404.html` を作成**
+- [x] **Step 1: `public/404.html` を作成**
 
 GitHub Pages で `/menu` や `/play` に直アクセスされたとき `404.html` が返るので、そこから `/` にリダイレクトし、元の URL を `sessionStorage` に保存する。`index.html`（root.tsx の Layout）側でこれを復元する。
 
@@ -710,7 +710,7 @@ GitHub Pages で `/menu` や `/play` に直アクセスされたとき `404.html
 </html>
 ```
 
-- [ ] **Step 2: 全テストが通ることを確認**
+- [x] **Step 2: 全テストが通ることを確認**
 
 ```bash
 npm test
@@ -718,7 +718,7 @@ npm test
 
 期待出力: 全テスト PASS。
 
-- [ ] **Step 3: ビルドが通ることを確認（SPA モード）**
+- [x] **Step 3: ビルドが通ることを確認（SPA モード）**
 
 ```bash
 npm run build
@@ -726,20 +726,21 @@ npm run build
 
 期待出力: `build/client/index.html` が生成される。エラーなし。
 
-- [ ] **Step 4: 開発サーバーで動作確認**
+- [x] **Step 4: 開発サーバーで動作確認**
 
 ```bash
-npm run dev
+# npm run dev
+npm run build && npm start
 ```
 
 ブラウザで以下を確認:
-- `http://localhost:5173/` → ログイン画面が表示される
+- `http://localhost:3000/` → ログイン画面が表示される
 - Googleサインインボタンをクリック → Google認証ポップアップが開く
 - 認証成功後 → `/menu` に遷移する
 - `/menu` に直アクセス → 未認証の場合 `/` にリダイレクトされる
 - `/play` に直アクセス → 未認証の場合 `/` にリダイレクトされる
 
-- [ ] **Step 5: コミット**
+- [x] **Step 5: コミット**
 
 ```bash
 git add public/404.html

@@ -191,7 +191,7 @@ export function useGameState(
       s.phase = 'menu';
       s.engine = null;
       setDisplay((prev) => ({ ...prev, phase: 'menu', results: null }));
-      navigateRef.current('/');
+      navigateRef.current('/menu');
     }
 
     function showResult() {
