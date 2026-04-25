@@ -1,3 +1,4 @@
+// app/root.tsx
 import {
   isRouteErrorResponse,
   Links,
@@ -10,9 +11,12 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import "./styles/game.css";
+import { AuthProvider } from "./context/AuthContext";
 import { GameProvider } from "./context/GameContext";
 
 export const links: Route.LinksFunction = () => [];
+
+const githubPagesSpaScript = `(function(){var r=sessionStorage.redirect;delete sessionStorage.redirect;if(r&&r!==location.href)history.replaceState(null,null,r);})();`;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +26,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script dangerouslySetInnerHTML={{ __html: githubPagesSpaScript }} />
       </head>
       <body>
         {children}
@@ -34,36 +39,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <GameProvider>
-      <div className="game-container">
-        <header>
-          <h1>aio-typing</h1>
-          <p>
-            書籍『
-            <a
-              href="https://linkage-club.net/books#all"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ALL IN ONE
-            </a>
-            』のタイピングソフトを簡単にしてみる。
-          </p>
-        </header>
-        <Outlet />
-        <footer>
-          <p>
-            <a
-              href="https://github.com/sgtao/aio-typing/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-          </p>
-        </footer>
-      </div>
-    </GameProvider>
+    <AuthProvider>
+      <GameProvider>
+        <div className="game-container">
+          <header>
+            <h1>aio-typing</h1>
+            <p>
+              書籍『
+              <a
+                href="https://linkage-club.net/books#all"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ALL IN ONE
+              </a>
+              』のタイピングソフトを簡単にしてみる。
+            </p>
+          </header>
+          <Outlet />
+          <footer>
+            <p>
+              <a
+                href="https://github.com/sgtao/aio-typing/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
+            </p>
+          </footer>
+        </div>
+      </GameProvider>
+    </AuthProvider>
   );
 }
 

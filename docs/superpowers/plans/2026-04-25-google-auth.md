@@ -367,7 +367,7 @@ git commit -m "feat: add LoginScreen with Google sign-in button"
 **Files:**
 - Create: `app/routes/login.tsx`
 
-- [ ] **Step 1: `app/routes/login.tsx` を作成**
+- [x] **Step 1: `app/routes/login.tsx` を作成**
 
 認証済みユーザーが `/` を訪問したとき `/menu` にリダイレクトする。未認証のときは `LoginScreen` を表示する。
 
@@ -401,13 +401,13 @@ export default function Login() {
 }
 ```
 
-- [ ] **Step 2: 型チェック（`+types/login` は routes.ts 更新後に生成されるため、一時的に警告が出てもよい）**
+- [x] **Step 2: 型チェック（`+types/login` は routes.ts 更新後に生成されるため、一時的に警告が出てもよい）**
 
 ```bash
 npm run typecheck
 ```
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add app/routes/login.tsx
@@ -422,7 +422,7 @@ git commit -m "feat: add login route - redirect to /menu if already authenticate
 - Create: `app/routes/menu.tsx`
 - Delete: `app/routes/home.tsx`
 
-- [ ] **Step 1: `app/routes/menu.tsx` を作成**
+- [x] **Step 1: `app/routes/menu.tsx` を作成**
 
 現在の `home.tsx` の役割をそのまま移植し、`ProtectedRoute` でラップする。
 
@@ -447,13 +447,13 @@ export default function Menu() {
 }
 ```
 
-- [ ] **Step 2: `app/routes/home.tsx` を削除**
+- [x] **Step 2: `app/routes/home.tsx` を削除**
 
 ```bash
 git rm app/routes/home.tsx
 ```
 
-- [ ] **Step 3: コミット（削除と追加をまとめて）**
+- [x] **Step 3: コミット（削除と追加をまとめて）**
 
 ```bash
 git add app/routes/menu.tsx
@@ -467,7 +467,7 @@ git commit -m "feat: add /menu route with ProtectedRoute, remove home.tsx"
 **Files:**
 - Modify: `app/routes.ts`
 
-- [ ] **Step 1: `app/routes.ts` を更新**
+- [x] **Step 1: `app/routes.ts` を更新**
 
 ```typescript
 // app/routes.ts
@@ -481,7 +481,7 @@ export default [
 ] satisfies RouteConfig;
 ```
 
-- [ ] **Step 2: 型チェック（`+types/login`, `+types/menu` が生成される）**
+- [x] **Step 2: 型チェック（`+types/login`, `+types/menu` が生成される）**
 
 ```bash
 npm run typecheck
@@ -489,7 +489,7 @@ npm run typecheck
 
 期待出力: エラーなし（型ファイルが自動生成される）。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add app/routes.ts
@@ -503,7 +503,7 @@ git commit -m "feat: update routes - / to login.tsx, add /menu"
 **Files:**
 - Modify: `app/root.tsx`
 
-- [ ] **Step 1: `app/root.tsx` を更新**
+- [x] **Step 1: `app/root.tsx` を更新**
 
 `AuthProvider` を `GameProvider` の外側に追加し、`Layout` の `<head>` に GitHub Pages URL 復元スクリプトを追加する。
 
@@ -614,13 +614,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 }
 ```
 
-- [ ] **Step 2: 型チェック**
+- [x] **Step 2: 型チェック**
 
 ```bash
 npm run typecheck
 ```
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add app/root.tsx
