@@ -24,7 +24,7 @@ export function LoginScreen() {
       <div className="login-card">
         <div className="login-avatar">🔑</div>
         <h2 className="login-title">Sign in</h2>
-        <p className="login-desc">タイピング練習にはGoogleアカウントが必要です。</p>
+        <p className="login-desc">利用にはGoogleアカウントが必要です。</p>
         <button
           onClick={handleSignIn}
           disabled={isLoading}

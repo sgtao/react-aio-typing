@@ -74,7 +74,7 @@ export function MenuScreen({ categories, settings, onUpdateSettings, onStart }: 
         <ToggleGroup
           label="モード"
           options={[
-            { value: 'typing' as const, label: 'タイピング練習' },
+            { value: 'typing' as const, label: 'タイピング' },
             { value: 'composition' as const, label: '英作文' },
           ]}
           value={settings.mode}
