@@ -1,15 +1,21 @@
 // dummy.tsx
-import type { Route } from "./+types/dummy";
+import type { ClientLoaderArgs } from "react-router";
 
-// このルートは Chrome DevTools 等のシステムリクエストを 404 にしないためのものです
-export function loader() {
-  // 200 OK と空の JSON を返します
+// 1. loader ではなく clientLoader を使用する
+export async function clientLoader({ request }: ClientLoaderArgs) {
+  // ブラウザ上で Response オブジェクトを作成して返します
   return new Response(JSON.stringify({}), {
-    headers: { "Content-Type": "application/json" },
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 }
 
+// 2. SPAモードで最初にこのURLが叩かれた時に loader を動かすための設定
+clientLoader.hydrate = true;
+
 export default function Dummy() {
-  // UIとして表示されることは想定していませんが、Reactのルールに従い null を返します
+  // 3. 自分自身を呼び出すと無限ループでクラッシュするため、null を返します
   return null;
 }
