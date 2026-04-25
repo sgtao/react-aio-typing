@@ -634,7 +634,7 @@ git commit -m "feat: add AuthProvider to root, add GitHub Pages SPA script"
 **Files:**
 - Modify: `app/routes/play.tsx`
 
-- [ ] **Step 1: `app/routes/play.tsx` を更新**
+- [x] **Step 1: `app/routes/play.tsx` を更新**
 
 未認証ガードを `ProtectedRoute` に委ねる。カテゴリ未選択時のリダイレクト先を `/` から `/menu` に変更する。
 
@@ -673,13 +673,13 @@ export default function Play() {
 }
 ```
 
-- [ ] **Step 2: 型チェック**
+- [x] **Step 2: 型チェック**
 
 ```bash
 npm run typecheck
 ```
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add app/routes/play.tsx
