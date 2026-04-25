@@ -37,31 +37,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AppHeader() {
+function SignOutBar() {
   const { user, signOut } = useAuth();
+  if (!user) return null;
   return (
-    <header className="app-header">
-      <div className="header-title">
-        <h1>aio-typing</h1>
-        <p>
-          書籍『
-          <a
-            href="https://linkage-club.net/books#all"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ALL IN ONE
-          </a>
-          』のタイピングソフトを簡単にしてみる。
-        </p>
-      </div>
-      {user && (
-        <div className="header-user">
-          <span className="user-name">{user.displayName ?? user.email}</span>
-          <button onClick={signOut} className="signout-btn">サインアウト</button>
-        </div>
-      )}
-    </header>
+    <div className="signout-bar">
+      <button onClick={signOut} className="signout-btn">
+        <span className="signout-btn__icon">→</span>
+        SIGN OUT
+      </button>
+    </div>
   );
 }
 
@@ -70,7 +55,21 @@ export default function App() {
     <AuthProvider>
       <GameProvider>
         <div className="game-container">
-          <AppHeader />
+          <header>
+            <h1>aio-typing</h1>
+            <p>
+              書籍『
+              <a
+                href="https://linkage-club.net/books#all"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ALL IN ONE
+              </a>
+              』のタイピングソフトを簡単にしてみる。
+            </p>
+          </header>
+          <SignOutBar />
           <Outlet />
           <footer>
             <p>

@@ -5,6 +5,10 @@ body {
   background-color: #c2e8fa;
 }
 
+h1 {
+  font-size: x-large;
+}
+
 .game-container {
   width: 80%;
   margin: 0 auto;
@@ -218,43 +222,26 @@ body {
   flex: 1;
 }
 
-/* ---- header with sign-out ---- */
+/* ---- sign-out bar ---- */
 
-.app-header {
+.signout-bar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1em;
-}
-
-.header-title {
-  flex: 1;
-}
-
-.header-user {
-  display: flex;
-  align-items: center;
-  gap: 0.6em;
-  padding-top: 0.3em;
-  flex-shrink: 0;
-}
-
-.user-name {
-  font-size: 12px;
-  color: #666;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-bottom: 0.5em;
 }
 
 .signout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: 'Courier New', monospace;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
   padding: 3px 10px;
   border: 1px solid #aaa;
   border-radius: 4px;
   background: #f8f8f8;
+  color: #555;
   cursor: pointer;
 }
 
@@ -262,6 +249,10 @@ body {
   background-color: #ffe8e8;
   border-color: #cc3030;
   color: #cc3030;
+}
+
+.signout-btn__icon {
+  font-size: 13px;
 }
 
 /* ---- login screen ---- */
