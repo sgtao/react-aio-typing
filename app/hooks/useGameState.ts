@@ -55,7 +55,11 @@ function sentenceToContent(s: Sentence): ContentItem {
   };
 }
 
-export function useGameState(csvPath: string, settings: Settings) {
+export function useGameState(
+  csvPath: string,
+  settings: Settings,
+  navigate: (to: string) => void,
+) {
   const [display, setDisplay] = useState<GameDisplay>({
     phase: 'menu',
     categories: [],
@@ -84,6 +88,10 @@ export function useGameState(csvPath: string, settings: Settings) {
     engine: null,
     timerHandle: null,
   });
+
+  const navigateRef = useRef(navigate);
+  navigateRef.current = navigate;
+  const cleanupFnRef = useRef<() => void>(() => {});
 
   const audioMap = useRef<Map<string, HTMLAudioElement>>(new Map());
   const csvPathRef = useRef(csvPath);
@@ -183,6 +191,7 @@ export function useGameState(csvPath: string, settings: Settings) {
       s.phase = 'menu';
       s.engine = null;
       setDisplay((prev) => ({ ...prev, phase: 'menu', results: null }));
+      navigateRef.current('/');
     }
 
     function showResult() {
@@ -279,14 +288,13 @@ export function useGameState(csvPath: string, settings: Settings) {
       if (!cfg.category) return;
 
       const sentences = csvLoader.getByCategory(cfg.category);
+      if (sentences.length === 0) return;
       s.contents = sentences.map(sentenceToContent);
       s.contentsIndex = s.contents.map((_, i) => i);
 
-      // Load audio files
       audio.forEach((el) => el.pause());
       audio.clear();
       for (const content of s.contents) {
-        // "[001]" → "001.mp3"
         const audioName = `${content.index.replace(/[\[\]]/g, '')}.mp3`;
         const audioPath = `audio/${audioName}`;
         const exists = await checkFileExist(audioPath);
@@ -294,10 +302,17 @@ export function useGameState(csvPath: string, settings: Settings) {
       }
 
       setDisplay((prev) => ({ ...prev, category: cfg.category! }));
-      setTimeout(() => nextContent(), 50);
+      // nextContent sets phase='playing' before navigate so play.tsx mounts with correct state
+      nextContent();
+      navigateRef.current('/play');
     }
 
     startGameFnRef.current = startGame;
+
+    cleanupFnRef.current = () => {
+      stopAllAudio();
+      stopStatsTimer();
+    };
 
     // --- event handlers ---
 
@@ -352,6 +367,7 @@ export function useGameState(csvPath: string, settings: Settings) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startGame = useCallback(() => startGameFnRef.current(), []);
+  const cleanup = useCallback(() => cleanupFnRef.current(), []);
 
-  return { display, startGame };
+  return { display, startGame, cleanup };
 }

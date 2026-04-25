@@ -9,6 +9,8 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import "./styles/game.css";
+import { GameProvider } from "./context/GameContext";
 
 export const links: Route.LinksFunction = () => [];
 
@@ -31,7 +33,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <GameProvider>
+      <div className="game-container">
+        <header>
+          <h1>aio-typing</h1>
+          <p>
+            書籍『
+            <a
+              href="https://linkage-club.net/books#all"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ALL IN ONE
+            </a>
+            』のタイピングソフトを簡単にしてみる。
+          </p>
+        </header>
+        <Outlet />
+        <footer>
+          <p>
+            <a
+              href="https://github.com/sgtao/aio-typing/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+          </p>
+        </footer>
+      </div>
+    </GameProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

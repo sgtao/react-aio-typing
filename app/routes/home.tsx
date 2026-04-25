@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
-import { TypingGame } from "../components/TypingGame";
+import { useGameContext } from '../context/GameContext';
+import { MenuScreen } from '../components/MenuScreen';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +10,13 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <TypingGame />;
+  const { display, settings, updateSettings, startGame } = useGameContext();
+  return (
+    <MenuScreen
+      categories={display.categories}
+      settings={settings}
+      onUpdateSettings={updateSettings}
+      onStart={startGame}
+    />
+  );
 }
