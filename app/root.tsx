@@ -11,7 +11,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import "./styles/game.css";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { GameProvider } from "./context/GameContext";
 
 export const links: Route.LinksFunction = () => [];
@@ -37,25 +37,40 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function AppHeader() {
+  const { user, signOut } = useAuth();
+  return (
+    <header className="app-header">
+      <div className="header-title">
+        <h1>aio-typing</h1>
+        <p>
+          書籍『
+          <a
+            href="https://linkage-club.net/books#all"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ALL IN ONE
+          </a>
+          』のタイピングソフトを簡単にしてみる。
+        </p>
+      </div>
+      {user && (
+        <div className="header-user">
+          <span className="user-name">{user.displayName ?? user.email}</span>
+          <button onClick={signOut} className="signout-btn">サインアウト</button>
+        </div>
+      )}
+    </header>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <GameProvider>
         <div className="game-container">
-          <header>
-            <h1>aio-typing</h1>
-            <p>
-              書籍『
-              <a
-                href="https://linkage-club.net/books#all"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ALL IN ONE
-              </a>
-              』のタイピングソフトを簡単にしてみる。
-            </p>
-          </header>
+          <AppHeader />
           <Outlet />
           <footer>
             <p>
