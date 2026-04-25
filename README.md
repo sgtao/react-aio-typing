@@ -2,9 +2,9 @@
 
 ## 概要
 
-- 書籍『ALL IN ONE 第４版』の英文（全418文・20カテゴリ）を使ったブラウザ型タイピング学習ゲーム
-- **タイピング**（英文を見て入力）と**英作文**（日本語訳から英文を入力）の2モードを備える
-- フルスペックのソフトは、Linkage Club『[ALL IN ONE](https://linkage-club.net/books#all)』の書籍を参考にしてみてください
+- 書籍『ALL IN ONE 第４版』の英文を活用したブラウザ型タイピング学習ゲーム
+  - **タイピング**（英文を見て入力）と**英作文**（日本語訳から英文を入力）の2モードを備える
+  - 最新版はLinkage Club『[ALL IN ONE](https://linkage-club.net/books#all)』の書籍をみてください
   - ALL IN ONE『[英語独学支援サイト](https://www.aio-english.net/)』
 
 ## 操作方法
@@ -24,7 +24,7 @@
 
 | 設定 | 選択肢 | 説明 |
 |------|--------|------|
-| カテゴリ | 01_時制 〜 20_比較と数量表現（全20種） | 出題する文のカテゴリを選択する |
+| カテゴリ | 01_時制 〜 20_比較と数量表現（全20種） | 出題する文のカテゴリを選択する（全419文） |
 | 出題順 | 順番 / ランダム | 順番: カテゴリ内を番号順に出題。ランダム: シャッフルして出題 |
 | ミスタイプ | ストリクト / フリー | ストリクト: 誤キーで入力がブロックされる。フリー: そのまま進み Backspace で修正できる |
 | 日本語訳 | スラッシュ訳 / 自然な訳 | タイピング中に表示する訳のスタイル |
@@ -72,16 +72,9 @@
 | Enter | 次の文へ |
 | Escape | メニューへ戻る |
 
-##### スナップショット
-
-| 01．ホーム画面 | 02．タイピング中 |
-| ----- | ----- |
-| ![image](./images/011_snapshotTopMenu.png) | ![image](./images/012_snapshotTypingContents.png) |
-
 ## 参考情報
 
 - 旧バージョン（静的HTML版）: [sgtao/aio-typing](https://github.com/sgtao/aio-typing)（[demo](https://sgtao.github.io/aio-typing/index.html)）
-- タイピングゲームの基礎: ドットインストール『[JavaScriptでタイピングゲームを作ろう](https://dotinstall.com/lessons/typing_js_v4)』
 
 ## LICENSE
 

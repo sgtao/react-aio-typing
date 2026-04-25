@@ -73,7 +73,7 @@ app/
 
 ### Content data format
 
-`public/allinone-text-contents.csv` を `csvLoader.ts` が起動時に1回だけ fetch してメモリにキャッシュする。全418文・20カテゴリを含む。
+`public/assets/allinone-text-contents.csv` を `csvLoader.ts` が起動時に1回だけ fetch してメモリにキャッシュする。全418文・20カテゴリを含む。
 
 | カラム | 説明 | 例 |
 |--------|------|----|
