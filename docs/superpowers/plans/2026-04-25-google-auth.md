@@ -184,7 +184,7 @@ npm run typecheck
 
 期待出力: エラーなし（`@react-router/dev` が型を生成するため、routes 関連の警告は後のタスクで解消される）。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add app/context/AuthContext.tsx
@@ -199,7 +199,7 @@ git commit -m "feat: add AuthContext with Firebase Google Sign-In"
 - Create: `app/components/ProtectedRoute.tsx`
 - Create: `app/components/__tests__/ProtectedRoute.test.tsx`
 
-- [ ] **Step 1: テストを先に作成（TDD）**
+- [x] **Step 1: テストを先に作成（TDD）**
 
 ```typescript
 // app/components/__tests__/ProtectedRoute.test.tsx
@@ -260,7 +260,7 @@ describe('ProtectedRoute', () => {
 });
 ```
 
-- [ ] **Step 2: テストを実行し、FAIL することを確認**
+- [x] **Step 2: テストを実行し、FAIL することを確認**
 
 ```bash
 npm test -- ProtectedRoute.test.tsx
@@ -268,7 +268,7 @@ npm test -- ProtectedRoute.test.tsx
 
 期待出力: `Cannot find module '../ProtectedRoute'` のようなエラーで FAIL する。
 
-- [ ] **Step 3: `app/components/ProtectedRoute.tsx` を作成**
+- [x] **Step 3: `app/components/ProtectedRoute.tsx` を作成**
 
 ```tsx
 // app/components/ProtectedRoute.tsx
@@ -284,7 +284,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 ```
 
-- [ ] **Step 4: テストを実行し、3件全て PASS することを確認**
+- [x] **Step 4: テストを実行し、3件全て PASS することを確認**
 
 ```bash
 npm test -- ProtectedRoute.test.tsx
