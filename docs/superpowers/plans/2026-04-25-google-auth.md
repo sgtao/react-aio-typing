@@ -85,7 +85,7 @@ export default defineConfig({
 import '@testing-library/jest-dom';
 ```
 
-- [ ] **Step 5: 既存テストが通ることを確認**
+- [x] **Step 5: 既存テストが通ることを確認**
 
 ```bash
 npm test
@@ -93,7 +93,7 @@ npm test
 
 期待出力: `typingEngine` の既存テストが全て PASS する。
 
-- [ ] **Step 6: コミット**
+- [x] **Step 6: コミット**
 
 ```bash
 git add react-router.config.ts vitest.config.ts app/test-setup.ts package.json package-lock.json
@@ -107,7 +107,7 @@ git commit -m "feat: install firebase, setup SPA mode and jsdom test environment
 **Files:**
 - Create: `app/context/AuthContext.tsx`
 
-- [ ] **Step 1: `app/context/AuthContext.tsx` を作成**
+- [x] **Step 1: `app/context/AuthContext.tsx` を作成**
 
 ```typescript
 // app/context/AuthContext.tsx
@@ -176,7 +176,7 @@ export function useAuth(): AuthContextValue {
 }
 ```
 
-- [ ] **Step 2: 型チェックを実行**
+- [x] **Step 2: 型チェックを実行**
 
 ```bash
 npm run typecheck
