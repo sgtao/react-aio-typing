@@ -377,6 +377,10 @@ export function useGameState(
       }
 
       if (s.escWarning) {
+        if (s.escWarningTimer !== null) {
+          clearTimeout(s.escWarningTimer);
+          s.escWarningTimer = null;
+        }
         s.escWarning = false;
         setDisplay((prev) => ({ ...prev, escWarning: false }));
       }
