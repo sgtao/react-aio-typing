@@ -10,6 +10,9 @@ import {
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 
+const DEV_SKIP_AUTH = import.meta.env.VITE_DEV_SKIP_AUTH === 'true';
+const DEV_MOCK_USER = { uid: 'dev-user', email: 'dev@local', displayName: 'Dev User' } as unknown as User;
+
 const firebaseConfig = {
   apiKey:     import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -32,10 +35,11 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(DEV_SKIP_AUTH ? DEV_MOCK_USER : null);
+  const [loading, setLoading] = useState(!DEV_SKIP_AUTH);
 
   useEffect(() => {
+    if (DEV_SKIP_AUTH) return;
     const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
@@ -44,11 +48,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    if (DEV_SKIP_AUTH) return;
     const provider = new GoogleAuthProvider();
     await signInWithPopup(getFirebaseAuth(), provider);
   };
 
   const signOut = async () => {
+    if (DEV_SKIP_AUTH) return;
     await firebaseSignOut(getFirebaseAuth());
   };
 
