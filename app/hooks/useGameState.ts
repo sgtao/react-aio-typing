@@ -24,6 +24,7 @@ export interface GameDisplay {
   accuracy: number;
   elapsed: number;
   results: TypingResults | null;
+  escWarning: boolean;
 }
 
 export type { TypedChar };
@@ -44,6 +45,7 @@ interface MutableState {
   translationMode: 'slashed' | 'natural';
   engine: TypingEngine | null;
   timerHandle: ReturnType<typeof setInterval> | null;
+  escWarning: boolean;
 }
 
 function sentenceToContent(s: Sentence): ContentItem {
@@ -76,6 +78,7 @@ export function useGameState(
     accuracy: 100,
     elapsed: 0,
     results: null,
+    escWarning: false,
   });
 
   const stateRef = useRef<MutableState>({
@@ -87,6 +90,7 @@ export function useGameState(
     translationMode: 'slashed',
     engine: null,
     timerHandle: null,
+    escWarning: false,
   });
 
   const navigateRef = useRef(navigate);
@@ -333,7 +337,25 @@ export function useGameState(
       }
 
       // playing
-      if (e.key === 'Escape') { e.preventDefault(); resetCurrentContent(); return; }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        const st = s.engine ? s.engine.getDisplayState() : null;
+        const typedLen = st ? st.typed.filter((c) => !c.auto).length : 0;
+        if (typedLen === 0) {
+          gotoMenu();
+        } else if (s.escWarning) {
+          gotoMenu();
+        } else {
+          s.escWarning = true;
+          resetCurrentContent();
+          setDisplay((prev) => ({ ...prev, escWarning: true }));
+          setTimeout(() => {
+            s.escWarning = false;
+            setDisplay((prev) => ({ ...prev, escWarning: false }));
+          }, 3000);
+        }
+        return;
+      }
       if (e.key === 'Enter') { e.preventDefault(); toggleAudio(); return; }
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -344,6 +366,11 @@ export function useGameState(
           setDisplay((prev) => ({ ...prev, translationMode: newMode, translateText }));
         }
         return;
+      }
+
+      if (s.escWarning) {
+        s.escWarning = false;
+        setDisplay((prev) => ({ ...prev, escWarning: false }));
       }
 
       if (!s.engine) return;

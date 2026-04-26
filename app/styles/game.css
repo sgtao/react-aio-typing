@@ -48,6 +48,12 @@ h1 {
   color: red;
 }
 
+.esc-warning {
+  font-size: 13px;
+  color: #cc3030;
+  margin: 0.2em 0;
+}
+
 .hint-text {
   font-size: 18px;
   letter-spacing: 0.05em;

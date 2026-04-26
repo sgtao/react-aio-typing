@@ -31,12 +31,12 @@ function TypingDisplay({ display }: Props) {
 }
 
 export function PlayingScreen({ display }: Props) {
-  const { category, currentIndex, hintText, translateText, translationMode, wpm, accuracy, elapsed } = display;
+  const { category, currentIndex, hintText, translateText, translationMode, escWarning, wpm, accuracy, elapsed } = display;
 
   return (
     <>
       <p className="instruction">
-        Enter=音声再生・停止／Tab=訳切替／Esc=リセット
+        Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)
       </p>
 
       <div className="category-index">
@@ -54,6 +54,10 @@ export function PlayingScreen({ display }: Props) {
       </p>
 
       {hintText && <p className="translate-text">{hintText}</p>}
+
+      {escWarning && (
+        <p className="esc-warning">もう一度 ESC を押すとメニューに戻ります</p>
+      )}
 
       <TypingDisplay display={display} />
 
