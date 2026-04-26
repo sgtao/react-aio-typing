@@ -46,6 +46,7 @@ interface MutableState {
   engine: TypingEngine | null;
   timerHandle: ReturnType<typeof setInterval> | null;
   escWarning: boolean;
+  escWarningTimer: ReturnType<typeof setTimeout> | null;
 }
 
 function sentenceToContent(s: Sentence): ContentItem {
@@ -91,6 +92,7 @@ export function useGameState(
     engine: null,
     timerHandle: null,
     escWarning: false,
+    escWarningTimer: null,
   });
 
   const navigateRef = useRef(navigate);
@@ -190,11 +192,16 @@ export function useGameState(
     // --- game state transitions ---
 
     function gotoMenu() {
+      if (s.escWarningTimer !== null) {
+        clearTimeout(s.escWarningTimer);
+        s.escWarningTimer = null;
+      }
+      s.escWarning = false;
       stopAllAudio();
       stopStatsTimer();
       s.phase = 'menu';
       s.engine = null;
-      setDisplay((prev) => ({ ...prev, phase: 'menu', results: null }));
+      setDisplay((prev) => ({ ...prev, phase: 'menu', results: null, escWarning: false }));
       navigateRef.current('/menu');
     }
 
@@ -349,8 +356,9 @@ export function useGameState(
           s.escWarning = true;
           resetCurrentContent();
           setDisplay((prev) => ({ ...prev, escWarning: true }));
-          setTimeout(() => {
+          s.escWarningTimer = setTimeout(() => {
             s.escWarning = false;
+            s.escWarningTimer = null;
             setDisplay((prev) => ({ ...prev, escWarning: false }));
           }, 3000);
         }
@@ -390,6 +398,10 @@ export function useGameState(
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       stopStatsTimer();
+      if (s.escWarningTimer !== null) {
+        clearTimeout(s.escWarningTimer);
+        s.escWarningTimer = null;
+      }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
