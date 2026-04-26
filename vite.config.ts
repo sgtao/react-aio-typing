@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  base: '/react-aio-typing/',
   plugins: [tailwindcss(), reactRouter(), react()],
   test: {
     environment: 'jsdom',
