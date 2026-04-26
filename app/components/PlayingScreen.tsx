@@ -46,14 +46,14 @@ export function PlayingScreen({ display }: Props) {
         </div>
       </div>
 
-      {hintText && <p className="hint-text">{hintText}</p>}
-
-      <p className="translate-text">
+      <p className="hint-text">
         <span className="translate-label">
           {translationMode === 'slashed' ? 'スラッシュ訳' : '自然な訳'}：
         </span>
         {translateText}
       </p>
+
+      {hintText && <p className="translate-text">{hintText}</p>}
 
       <TypingDisplay display={display} />
 
