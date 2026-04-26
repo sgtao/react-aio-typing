@@ -5,7 +5,7 @@ import { useGameState } from '../hooks/useGameState';
 import type { GameDisplay } from '../hooks/useGameState';
 import type { Settings } from '../hooks/useSettings';
 
-const CSV_PATH = '/assets/allinone-text-contents.csv';
+const CSV_PATH = `${import.meta.env.BASE_URL}assets/allinone-text-contents.csv`;
 
 interface GameContextValue {
   display: GameDisplay;

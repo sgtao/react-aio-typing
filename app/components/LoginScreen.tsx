@@ -31,7 +31,7 @@ export function LoginScreen() {
           className={`google-signin-btn${isLoading ? ' google-signin-btn--disabled' : ''}`}
         >
           <span className="google-signin-btn__icon">
-            <img src="/google-icon.svg" alt="Google" width="46" height="46" />
+            <img src={`${import.meta.env.BASE_URL}google-icon.svg`} alt="Google" width="46" height="46" />
           </span>
           <span className="google-signin-btn__text">
             {isLoading ? 'サインイン中...' : 'Sign in with Google'}
