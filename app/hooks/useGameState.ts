@@ -205,7 +205,7 @@ export function useGameState(
       stopStatsTimer();
       s.phase = 'menu';
       s.engine = null;
-      setDisplay((prev) => ({ ...prev, phase: 'menu', results: null, escWarning: false }));
+      setDisplay((prev) => ({ ...prev, phase: 'menu', results: null, escWarning: false, shiftHintActive: false }));
       navigateRef.current('/menu');
     }
 
@@ -225,6 +225,7 @@ export function useGameState(
         accuracy: results.accuracy,
         elapsed: results.elapsed,
         results,
+        shiftHintActive: false,
       }));
     }
 
