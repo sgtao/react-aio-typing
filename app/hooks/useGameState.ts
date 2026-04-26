@@ -25,6 +25,8 @@ export interface GameDisplay {
   elapsed: number;
   results: TypingResults | null;
   escWarning: boolean;
+  mode: 'typing' | 'composition';
+  shiftHintActive: boolean;
 }
 
 export type { TypedChar };
@@ -80,6 +82,8 @@ export function useGameState(
     elapsed: 0,
     results: null,
     escWarning: false,
+    mode: 'typing',
+    shiftHintActive: false,
   });
 
   const stateRef = useRef<MutableState>({
@@ -288,6 +292,8 @@ export function useGameState(
         accuracy: 100,
         elapsed: 0,
         results: null,
+        mode: cfg.mode,
+        shiftHintActive: false,
       }));
 
       startStatsTimer();
@@ -375,6 +381,10 @@ export function useGameState(
         }
         return;
       }
+      if (e.key === 'Shift' && settingsRef.current.mode === 'composition') {
+        setDisplay((prev) => ({ ...prev, shiftHintActive: true }));
+        return;
+      }
 
       if (s.escWarning) {
         if (s.escWarningTimer !== null) {
@@ -398,9 +408,17 @@ export function useGameState(
       if (result.complete) showResult();
     }
 
+    function handleKeyUp(e: KeyboardEvent) {
+      if (e.key === 'Shift') {
+        setDisplay((prev) => ({ ...prev, shiftHintActive: false }));
+      }
+    }
+
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
       stopStatsTimer();
       if (s.escWarningTimer !== null) {
         clearTimeout(s.escWarningTimer);
