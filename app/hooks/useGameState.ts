@@ -247,6 +247,7 @@ export function useGameState(
         accuracy: 100,
         elapsed: 0,
         results: null,
+        shiftHintActive: false,
       }));
     }
 
@@ -382,7 +383,7 @@ export function useGameState(
         }
         return;
       }
-      if (e.key === 'Shift' && settingsRef.current.mode === 'composition') {
+      if (e.key === 'Shift' && !e.repeat && settingsRef.current.mode === 'composition') {
         setDisplay((prev) => ({ ...prev, shiftHintActive: true }));
         return;
       }
@@ -415,11 +416,17 @@ export function useGameState(
       }
     }
 
+    function handleBlur() {
+      setDisplay((prev) => ({ ...prev, shiftHintActive: false }));
+    }
+
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
       stopStatsTimer();
       if (s.escWarningTimer !== null) {
         clearTimeout(s.escWarningTimer);
