@@ -74,7 +74,7 @@ export default function App() {
           <footer>
             <p>
               <a
-                href="https://github.com/sgtao/aio-typing/"
+                href="https://github.com/sgtao/react-aio-typing/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
