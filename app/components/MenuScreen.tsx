@@ -5,6 +5,7 @@ interface Props {
   settings: Settings;
   onUpdateSettings: (partial: Partial<Settings>) => void;
   onStart: () => void;
+  onHistory: () => void;
 }
 
 interface ToggleProps<T extends string | number | boolean> {
@@ -41,7 +42,7 @@ function ToggleGroup<T extends string | number | boolean>({
   );
 }
 
-export function MenuScreen({ categories, settings, onUpdateSettings, onStart }: Props) {
+export function MenuScreen({ categories, settings, onUpdateSettings, onStart, onHistory }: Props) {
   return (
     <>
       <p className="instruction">設定を選んでスタートしてください</p>
@@ -124,6 +125,16 @@ export function MenuScreen({ categories, settings, onUpdateSettings, onStart }: 
         }}
       >
         START (Enter)
+      </button>
+
+      <button
+        className="history-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          onHistory();
+        }}
+      >
+        📋 学習履歴
       </button>
     </>
   );

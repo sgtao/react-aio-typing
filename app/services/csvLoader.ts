@@ -73,4 +73,8 @@ function getByCategory(category: string): Sentence[] {
   return cache.filter((s) => s.category === category);
 }
 
-export const csvLoader = { fetchAll, getCategories, getByCategory };
+function getAll(): Sentence[] {
+  return cache ?? [];
+}
+
+export const csvLoader = { fetchAll, getCategories, getByCategory, getAll };

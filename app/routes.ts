@@ -4,5 +4,6 @@ export default [
   index("routes/login.tsx"),
   route("menu", "routes/menu.tsx"),
   route("play", "routes/play.tsx"),
+  route("history", "routes/history.tsx"),
   route(".well-known/appspecific/com.chrome.devtools.json", "routes/dummy.tsx"),
 ] satisfies RouteConfig;

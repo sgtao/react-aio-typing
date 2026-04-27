@@ -5,6 +5,7 @@ import { checkFileExist } from '../services/resourceLoader';
 import { TypingEngine, generateHint, buildPendingMask } from '../services/typingEngine';
 import type { TypingResults, TypedChar } from '../services/typingEngine';
 import type { Settings } from './useSettings';
+import { historyStorage } from '../services/historyStorage';
 
 export type GamePhase = 'menu' | 'playing' | 'result';
 
@@ -32,6 +33,8 @@ export interface GameDisplay {
 export type { TypedChar };
 
 interface ContentItem {
+  no: number;
+  category: string;
   index: string;
   word: string;
   translate: string;
@@ -53,6 +56,8 @@ interface MutableState {
 
 function sentenceToContent(s: Sentence): ContentItem {
   return {
+    no: s.no,
+    category: s.category,
     index: s.index,
     word: s.englishText,
     translate: s.translationSlashed,
@@ -210,11 +215,26 @@ export function useGameState(
     }
 
     function showResult() {
-      if (!s.engine) return;
+      if (!s.engine || !s.currentContent) return;
       stopStatsTimer();
       stopAudio(s.currentIndex);
       const results = s.engine.getResults();
       const st = s.engine.getDisplayState();
+
+      historyStorage.saveSession({
+        no:        s.currentContent.no,
+        category:  s.currentContent.category,
+        index:     s.currentContent.index,
+        mode:      settingsRef.current.mode,
+        wpm:       results.wpm,
+        accuracy:  results.accuracy,
+        elapsed:   results.elapsed,
+        timestamp: Date.now(),
+      });
+      if (results.mistypeCount > 0) {
+        historyStorage.recordMistypes(s.currentContent.no, results.mistypeCount);
+      }
+
       s.phase = 'result';
       setDisplay((prev) => ({
         ...prev,

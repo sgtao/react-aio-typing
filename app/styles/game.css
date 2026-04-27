@@ -361,3 +361,268 @@ h1 {
   font-size: 11px;
   color: #aaa;
 }
+
+/* ---- history screen ---- */
+
+.history-header {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 0.8em;
+}
+
+.history-back-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 4px 12px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.history-back-btn:hover {
+  background: #e8e8e8;
+}
+
+.history-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.history-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 1em;
+}
+
+.history-tab-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 4px 12px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.history-tab-btn.active {
+  background-color: #c2e8fa;
+  border-color: #5ba3c9;
+  font-weight: bold;
+}
+
+.history-content {
+  min-height: 200px;
+  text-align: left;
+}
+
+.history-empty {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  padding: 2em 0;
+}
+
+/* -- category tab -- */
+
+.category-summary {
+  background: #f0f0f0;
+  border-radius: 0.3em;
+  padding: 0.5em 0.8em;
+  font-size: 14px;
+  margin-bottom: 0.8em;
+}
+
+.category-item {
+  margin: 0.6em 0;
+}
+
+.category-item-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.progress-bar-wrap {
+  background: #e8e8e8;
+  border-radius: 3px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+.progress-bar {
+  background: #c2e8fa;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.category-item-counts {
+  font-size: 11px;
+  color: #888;
+}
+
+/* -- sessions tab -- */
+
+.session-item {
+  border-bottom: 1px solid #eee;
+  padding: 0.5em 0;
+}
+
+.session-item-meta {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 3px;
+}
+
+.session-item-scores {
+  display: flex;
+  gap: 1em;
+  font-size: 12px;
+  color: #555;
+}
+
+/* -- weak tab -- */
+
+.weak-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 0.5em 0;
+  gap: 0.5em;
+}
+
+.weak-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.weak-item-meta {
+  font-size: 11px;
+  color: #888;
+}
+
+.weak-item-text {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weak-count {
+  font-size: 13px;
+  font-weight: bold;
+  color: #cc3030;
+  white-space: nowrap;
+}
+
+/* -- history button in menu -- */
+
+.history-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 0.4em 1.5em;
+  margin: 0.3em 0;
+  background: #f0f8ff;
+  border: 1px solid #5ba3c9;
+  border-radius: 0.5em;
+  cursor: pointer;
+}
+
+.history-btn:hover {
+  background: #c2e8fa;
+}
+
+/* -- reset button -- */
+
+.history-reset-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 0.4em 1.2em;
+  margin-top: 1.5em;
+  background: #fff0f0;
+  border: 1px solid #cc3030;
+  border-radius: 0.5em;
+  color: #cc3030;
+  cursor: pointer;
+}
+
+.history-reset-btn:hover {
+  background: #ffe0e0;
+}
+
+/* ---- modal dialog ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-dialog {
+  background: white;
+  border-radius: 0.5em;
+  padding: 1.5em 2em;
+  max-width: 340px;
+  width: 90%;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 0.8em;
+}
+
+.modal-body {
+  font-size: 13px;
+  color: #555;
+  margin: 0 0 1.2em;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8em;
+}
+
+.modal-cancel-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 0.4em 1em;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.modal-cancel-btn:hover {
+  background: #e8e8e8;
+}
+
+.modal-confirm-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 0.4em 1em;
+  border: 1px solid #cc3030;
+  border-radius: 4px;
+  background: #cc3030;
+  color: white;
+  cursor: pointer;
+}
+
+.modal-confirm-btn:hover {
+  background: #aa2020;
+}
