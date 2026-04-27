@@ -1,3 +1,5 @@
+import * as jsYaml from 'js-yaml';
+
 export interface Sentence {
   no: number;
   index: string;              // "[001]"
@@ -6,6 +8,12 @@ export interface Sentence {
   englishText: string;
   translationSlashed: string;
   translationNatural: string;
+}
+
+interface SectionEntry {
+  category: string;
+  categoryIndex: string;
+  file: string;
 }
 
 let cache: Sentence[] | null = null;
@@ -43,24 +51,36 @@ function parseCSV(text: string): string[][] {
   return rows;
 }
 
-async function fetchAll(path: string): Promise<void> {
+async function fetchAll(basePath: string): Promise<void> {
   if (cache) return;
-  const resp = await fetch(path);
-  if (!resp.ok) throw new Error(`CSV load failed: ${resp.status}`);
-  const text = await resp.text();
-  const rows = parseCSV(text);
-  cache = rows
-    .slice(1) // skip header
-    .filter((row) => row.length >= 7 && row[4]?.trim())
-    .map((row) => ({
-      no: parseInt(row[0], 10),
-      index: row[1].trim(),
-      category: row[2].trim(),
-      categoryIndex: row[3].trim(),
-      englishText: row[4].trim(),
-      translationSlashed: row[5].trim(),
-      translationNatural: row[6].trim(),
-    }));
+
+  const yamlResp = await fetch(`${basePath}categories.yaml`);
+  if (!yamlResp.ok) throw new Error(`categories.yaml load failed: ${yamlResp.status}`);
+  const yamlText = await yamlResp.text();
+  const { sections } = jsYaml.load(yamlText) as { sections: SectionEntry[] };
+
+  const csvTexts = await Promise.all(
+    sections.map(async (s) => {
+      const resp = await fetch(`${basePath}${s.file}`);
+      if (!resp.ok) throw new Error(`CSV load failed: ${s.file} ${resp.status}`);
+      return resp.text();
+    })
+  );
+
+  cache = csvTexts.flatMap((text) =>
+    parseCSV(text)
+      .slice(1) // skip header
+      .filter((row) => row.length >= 7 && row[4]?.trim())
+      .map((row) => ({
+        no: parseInt(row[0], 10),
+        index: row[1].trim(),
+        category: row[2].trim(),
+        categoryIndex: row[3].trim(),
+        englishText: row[4].trim(),
+        translationSlashed: row[5].trim(),
+        translationNatural: row[6].trim(),
+      }))
+  );
 }
 
 function getCategories(): string[] {
