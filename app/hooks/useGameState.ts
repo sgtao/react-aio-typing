@@ -309,6 +309,16 @@ const stateRef = useRef<MutableState>({
       setDisplay((prev) => ({ ...prev, isAudioPlaying: !el.paused && !el.ended }));
     }
 
+    function clearEscWarning() {
+      if (!s.escWarning) return;
+      if (s.escWarningTimer !== null) {
+        clearTimeout(s.escWarningTimer);
+        s.escWarningTimer = null;
+      }
+      s.escWarning = false;
+      setDisplay((prev) => ({ ...prev, escWarning: false }));
+    }
+
     function loadContent(pos: number) {
       const contentIdx = s.playOrder[pos];
       const content = s.contents[contentIdx];
@@ -432,12 +442,22 @@ const stateRef = useRef<MutableState>({
       if (phase === 'result') {
         if (e.key === 'Enter') { e.preventDefault(); nextContent(); }
         else if (e.key === 'Escape') gotoMenu();
+        else if (e.key === 'Tab') {
+          e.preventDefault();
+          const newMode = s.translationMode === 'slashed' ? 'natural' : 'slashed';
+          s.translationMode = newMode;
+          if (s.currentContent) {
+            const translateText = computeTranslateText(s.currentContent, newMode);
+            setDisplay((prev) => ({ ...prev, translationMode: newMode, translateText }));
+          }
+        }
         return;
       }
 
       // playing
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
+        clearEscWarning();
         const st = s.engine ? s.engine.getDisplayState() : null;
         const typedManual = st ? st.typed.filter((c) => !c.auto).length : 0;
         if (typedManual > 0) {
@@ -451,6 +471,7 @@ const stateRef = useRef<MutableState>({
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
+        clearEscWarning();
         if (s.currentContentIdx < s.playOrder.length - 1) {
           loadContent(s.currentContentIdx + 1);
         } else {

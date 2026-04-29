@@ -11,12 +11,19 @@ function formatTime(ms: number): string {
 }
 
 export function ResultScreen({ display }: Props) {
-  const { results, targetText } = display;
+  const { results, targetText, translateText, translationMode } = display;
   if (!results) return null;
 
   return (
     <>
-      <p className="instruction">Enter=次の文へ／Esc=メニューへ戻る</p>
+      <p className="instruction">Enter=次の文へ／Tab=訳切替／Esc=メニューへ戻る</p>
+
+      <p className="hint-text">
+        <span className="translate-label">
+          {translationMode === 'slashed' ? 'スラッシュ訳' : '自然な訳'}：
+        </span>
+        {translateText}
+      </p>
 
       <div className="result-stats">
         <span className="result-stat-item">
