@@ -29,57 +29,16 @@ function barColor(pct: number): string {
 function CategoryTab({ onCategoryResetRequest }: {
   onCategoryResetRequest: (cat: string) => void;
 }) {
-  const allSentences = csvLoader.getAll();
   const sessions = historyStorage.getSessions();
   const attemptedNos = new Set(sessions.map((s) => s.no));
   const categories = csvLoader.getCategories();
 
-  if (!allSentences.length) {
+  if (!csvLoader.getAll().length) {
     return <p className="history-empty">データ読み込み中...</p>;
   }
 
-  const totalAll = allSentences.length;
-  const attemptedAll = allSentences.filter((s) => attemptedNos.has(s.no)).length;
-
-  const completedCategories = categories.filter((cat) =>
-    csvLoader.getByCategory(cat).every((s) => attemptedNos.has(s.no))
-  ).length;
-  const totalCategories = categories.length;
-
-  const avgWpm = sessions.length > 0
-    ? Math.round(sessions.reduce((sum, s) => sum + s.wpm, 0) / sessions.length)
-    : null;
-  const avgAccuracy = sessions.length > 0
-    ? Math.round(sessions.reduce((sum, s) => sum + s.accuracy, 0) / sessions.length)
-    : null;
-
   return (
     <>
-      <div className="category-summary-stats">
-        <div className="summary-stat-card">
-          <div className="summary-stat-label">挑戦数</div>
-          <div className="summary-stat-value">
-            {attemptedAll}
-            <span className="summary-stat-total"> / {totalAll}</span>
-          </div>
-        </div>
-        <div className="summary-stat-card">
-          <div className="summary-stat-label">セクション完了</div>
-          <div className="summary-stat-value">
-            {completedCategories}
-            <span className="summary-stat-total"> / {totalCategories}</span>
-          </div>
-        </div>
-        <div className="summary-stat-card">
-          <div className="summary-stat-label">平均 WPM / 正確率</div>
-          <div className="summary-stat-value">
-            {avgWpm !== null ? `${avgWpm} WPM` : '—'}
-          </div>
-          <div className="summary-stat-sub">
-            {avgAccuracy !== null ? `${avgAccuracy}%` : '—'}
-          </div>
-        </div>
-      </div>
       {categories.map((cat) => {
         const catSentences = csvLoader.getByCategory(cat);
         const total = catSentences.length;
@@ -205,12 +164,31 @@ function ResetDialog({
 }
 
 export function HistoryScreen() {
-  const [tab, setTab] = useState<Tab>('category');
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [categoryToReset, setCategoryToReset] = useState<string | null>(null);
 
+  const allSentences = csvLoader.getAll();
   const sessions = historyStorage.getSessions();
+  const attemptedNos = new Set(sessions.map((s) => s.no));
+  const categories = csvLoader.getCategories();
+  const totalAll = allSentences.length;
+  const attemptedAll = allSentences.filter((s) => attemptedNos.has(s.no)).length;
+  const completedCategories = categories.filter((cat) =>
+    csvLoader.getByCategory(cat).every((s) => attemptedNos.has(s.no))
+  ).length;
+  const totalCategories = categories.length;
+  const avgWpm = sessions.length > 0
+    ? Math.round(sessions.reduce((sum, s) => sum + s.wpm, 0) / sessions.length)
+    : null;
+  const avgAccuracy = sessions.length > 0
+    ? Math.round(sessions.reduce((sum, s) => sum + s.accuracy, 0) / sessions.length)
+    : null;
+
+  function handleCardClick(t: Tab) {
+    setActiveTab((prev) => (prev === t ? null : t));
+  }
 
   function handleReset() {
     historyStorage.clearAll();
@@ -229,25 +207,56 @@ export function HistoryScreen() {
     <>
       <h2 className="history-title">学習履歴</h2>
 
-      <div className="history-tabs">
-        {(['category', 'sessions', 'weak'] as Tab[]).map((t) => (
-          <button
-            key={t}
-            className={`history-tab-btn${tab === t ? ' active' : ''}`}
-            onClick={() => setTab(t)}
+      <div className="category-summary-stats">
+        {(
+          [
+            {
+              tab: 'category' as Tab,
+              modifier: 'challenge',
+              label: '挑戦数',
+              value: <>{attemptedAll}<span className="summary-stat-total"> / {totalAll}</span></>,
+              sub: null,
+            },
+            {
+              tab: 'sessions' as Tab,
+              modifier: 'complete',
+              label: 'セクション完了',
+              value: <>{completedCategories}<span className="summary-stat-total"> / {totalCategories}</span></>,
+              sub: null,
+            },
+            {
+              tab: 'weak' as Tab,
+              modifier: 'stats',
+              label: '平均 WPM / 正確率',
+              value: avgWpm !== null ? `${avgWpm} WPM` : '—',
+              sub: avgAccuracy !== null ? `${avgAccuracy}%` : '—',
+            },
+          ] as const
+        ).map(({ tab, modifier, label, value, sub }) => (
+          <div
+            key={tab}
+            className={`summary-stat-card summary-stat-card--${modifier}${activeTab === tab ? ' summary-stat-card--active' : ''}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => handleCardClick(tab)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCardClick(tab)}
           >
-            {t === 'category' ? 'カテゴリ別' : t === 'sessions' ? 'セッション履歴' : '苦手な文'}
-          </button>
+            <div className="summary-stat-label">{label}</div>
+            <div className="summary-stat-value">{value}</div>
+            {sub !== null && <div className="summary-stat-sub">{sub}</div>}
+          </div>
         ))}
       </div>
 
-      <div className="history-content" key={resetKey}>
-        {tab === 'category' && (
-          <CategoryTab onCategoryResetRequest={(cat) => setCategoryToReset(cat)} />
-        )}
-        {tab === 'sessions' && <SessionsTab sessions={sessions} />}
-        {tab === 'weak' && <WeakTab />}
-      </div>
+      {activeTab !== null && (
+        <div className="history-content" key={resetKey}>
+          {activeTab === 'category' && (
+            <CategoryTab onCategoryResetRequest={(cat) => setCategoryToReset(cat)} />
+          )}
+          {activeTab === 'sessions' && <SessionsTab sessions={sessions} />}
+          {activeTab === 'weak' && <WeakTab />}
+        </div>
+      )}
 
       <button className="history-reset-btn" onClick={() => setShowResetDialog(true)}>
         全履歴をリセット
