@@ -6,6 +6,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
+  useNavigate,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -37,15 +39,47 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SignOutBar() {
-  const { user, signOut } = useAuth();
-  if (!user) return null;
+function AppHeader() {
+  const location = useLocation();
+  const isMenu = location.pathname === '/menu';
   return (
-    <div className="signout-bar">
+    <header className="app-header">
+      <h1>aio-typing</h1>
+      {isMenu && (
+        <p>
+          書籍『
+          <a
+            href="https://linkage-club.net/books#all"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="header-link"
+          >
+            ALL IN ONE
+          </a>
+          』のタイピングソフトを簡単にしてみる。
+        </p>
+      )}
+    </header>
+  );
+}
+
+function NavBar() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  if (!user) return null;
+  const showBackBtn = location.pathname !== '/menu' && location.pathname !== '/';
+  return (
+    <div className="nav-bar">
       <button onClick={signOut} className="signout-btn">
         <span className="signout-btn__icon">→</span>
         SIGN OUT
       </button>
+      {showBackBtn && (
+        <button onClick={() => navigate('/menu')} className="back-btn">
+          ← メニューへ戻る
+        </button>
+      )}
     </div>
   );
 }
@@ -54,22 +88,9 @@ export default function App() {
   return (
     <AuthProvider>
       <GameProvider>
+        <AppHeader />
         <div className="game-container">
-          <header>
-            <h1>aio-typing</h1>
-            <p>
-              書籍『
-              <a
-                href="https://linkage-club.net/books#all"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ALL IN ONE
-              </a>
-              』のタイピングソフトを簡単にしてみる。
-            </p>
-          </header>
-          <SignOutBar />
+          <NavBar />
           <Outlet />
           <footer>
             <p>

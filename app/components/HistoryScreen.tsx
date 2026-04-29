@@ -1,6 +1,5 @@
 // app/components/HistoryScreen.tsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { historyStorage } from '../services/historyStorage';
 import type { SessionRecord } from '../services/historyStorage';
 import { csvLoader } from '../services/csvLoader';
@@ -206,7 +205,6 @@ function ResetDialog({
 }
 
 export function HistoryScreen() {
-  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('category');
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -229,12 +227,7 @@ export function HistoryScreen() {
 
   return (
     <>
-      <div className="history-header">
-        <button className="history-back-btn" onClick={() => navigate('/menu')}>
-          ← メニューへ戻る
-        </button>
-        <h2 className="history-title">学習履歴</h2>
-      </div>
+      <h2 className="history-title">学習履歴</h2>
 
       <div className="history-tabs">
         {(['category', 'sessions', 'weak'] as Tab[]).map((t) => (

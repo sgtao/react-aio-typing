@@ -1,5 +1,5 @@
 body {
-  padding-top: 40px;
+  padding-top: 20px;
   font-family: 'Courier New', monospace;
   text-align: center;
   background-color: #c2e8fa;
@@ -7,6 +7,28 @@ body {
 
 h1 {
   font-size: x-large;
+}
+
+/* ---- app header (blue background area) ---- */
+
+.app-header {
+  padding: 0.4em 0 0.6em;
+  color: #1a3a5c;
+}
+
+.app-header h1 {
+  margin: 0 0 0.1em;
+}
+
+.app-header p {
+  margin: 0;
+  font-size: 13px;
+  color: #2a4a6c;
+}
+
+.header-link {
+  color: #1a6bbf;
+  font-weight: bold;
 }
 
 .game-container {
@@ -243,10 +265,11 @@ h1 {
   flex: 1;
 }
 
-/* ---- sign-out bar ---- */
+/* ---- nav bar (sign-out + back button) ---- */
 
-.signout-bar {
+.nav-bar {
   display: flex;
+  gap: 0.5em;
   margin-bottom: 0.5em;
 }
 
@@ -274,6 +297,27 @@ h1 {
 
 .signout-btn__icon {
   font-size: 13px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background: #f8f8f8;
+  color: #555;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background-color: #e8f0ff;
+  border-color: #3060cc;
+  color: #3060cc;
 }
 
 /* ---- login screen ---- */
@@ -600,9 +644,9 @@ h1 {
 
 .history-btn {
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 16px;
   padding: 0.4em 1.5em;
-  margin: 0.3em 0;
+  margin: 0.8em 0 0.3em;
   background: #f0f8ff;
   border: 1px solid #5ba3c9;
   border-radius: 0.5em;
