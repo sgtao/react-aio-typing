@@ -27,7 +27,9 @@ function barColor(pct: number): string {
   return          'hsl(138, 58%, 35%)';
 }
 
-function CategoryTab() {
+function CategoryTab({ onCategoryResetRequest }: {
+  onCategoryResetRequest: (cat: string) => void;
+}) {
   const allSentences = csvLoader.getAll();
   const sessions = historyStorage.getSessions();
   const attemptedNos = new Set(sessions.map((s) => s.no));
@@ -88,7 +90,16 @@ function CategoryTab() {
           <div key={cat} className="category-item">
             <div className="category-item-header">
               <span className="category-item-name">{cat}</span>
-              <span className="category-item-pct">{pct}%</span>
+              <div className="category-item-header-right">
+                <span className="category-item-pct">{pct}%</span>
+                <button
+                  className="category-reset-btn"
+                  onClick={() => onCategoryResetRequest(cat)}
+                  title={`${cat} の履歴をリセット`}
+                >
+                  🗑
+                </button>
+              </div>
             </div>
             <div className="progress-bar-wrap">
               <div className="progress-bar" style={{ width: `${pct}%`, backgroundColor: barColor(pct) }} />
@@ -199,12 +210,20 @@ export function HistoryScreen() {
   const [tab, setTab] = useState<Tab>('category');
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [categoryToReset, setCategoryToReset] = useState<string | null>(null);
 
   const sessions = historyStorage.getSessions();
 
   function handleReset() {
     historyStorage.clearAll();
     setShowResetDialog(false);
+    setResetKey((k) => k + 1);
+  }
+
+  function handleCategoryReset(cat: string) {
+    const nos = csvLoader.getByCategory(cat).map((s) => s.no);
+    historyStorage.clearByCategory(cat, nos);
+    setCategoryToReset(null);
     setResetKey((k) => k + 1);
   }
 
@@ -230,7 +249,9 @@ export function HistoryScreen() {
       </div>
 
       <div className="history-content" key={resetKey}>
-        {tab === 'category' && <CategoryTab />}
+        {tab === 'category' && (
+          <CategoryTab onCategoryResetRequest={(cat) => setCategoryToReset(cat)} />
+        )}
         {tab === 'sessions' && <SessionsTab sessions={sessions} />}
         {tab === 'weak' && <WeakTab />}
       </div>
@@ -245,6 +266,14 @@ export function HistoryScreen() {
           body={"セッション履歴と苦手な文を全て削除します。\nこの操作は元に戻せません。"}
           onCancel={() => setShowResetDialog(false)}
           onConfirm={handleReset}
+        />
+      )}
+      {categoryToReset && (
+        <ResetDialog
+          title={`「${categoryToReset}」の履歴をリセット`}
+          body={`このカテゴリのセッション履歴と苦手データを削除します。\nこの操作は元に戻せません。`}
+          onCancel={() => setCategoryToReset(null)}
+          onConfirm={() => handleCategoryReset(categoryToReset)}
         />
       )}
     </>
