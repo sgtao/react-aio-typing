@@ -458,6 +458,7 @@ h1 {
   font-size: 18px;
   font-weight: bold;
   margin: 0;
+  margin-bottom: 0.5em;
 }
 
 .summary-stat-card {
@@ -466,27 +467,32 @@ h1 {
   padding: 0.75em 0.8em;
   text-align: center;
   cursor: pointer;
-  transition: filter 0.15s;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, transform 0.15s;
   user-select: none;
 }
 
-.summary-stat-card:hover {
-  filter: brightness(0.96);
-}
+.summary-stat-card--challenge:hover,
+.summary-stat-card--complete:hover,
+.summary-stat-card--stats:hover     { transform: translateY(-4px); }
+
+.summary-stat-card--challenge:hover { border-color: hsl(211, 68%, 42%); }
+.summary-stat-card--complete:hover  { border-color: hsl(145, 52%, 38%); }
+.summary-stat-card--stats:hover     { border-color: hsl(35,  82%, 42%); }
 
 .summary-stat-card:focus-visible {
-  outline: 2px solid rgba(0, 0, 0, 0.2);
+  outline: 2px solid rgba(255, 255, 255, 0.9);
   outline-offset: 2px;
 }
 
 .summary-stat-card--active {
-  filter: brightness(0.93);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.12);
+  border-color: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-.summary-stat-card--challenge { background: hsl(211, 72%, 85%); }
-.summary-stat-card--complete  { background: hsl(145, 58%, 83%); }
-.summary-stat-card--stats     { background: hsl(35,  88%, 83%); }
+.summary-stat-card--challenge { background: hsl(211, 68%, 68%); }
+.summary-stat-card--complete  { background: hsl(145, 52%, 63%); }
+.summary-stat-card--stats     { background: hsl(35,  82%, 65%); }
 
 .history-content {
   min-height: 200px;
@@ -510,7 +516,7 @@ h1 {
 
 .summary-stat-label {
   font-size: 0.72rem;
-  color: #555;
+  color: rgba(255, 255, 255, 0.88);
   margin-bottom: 0.15em;
   letter-spacing: 0.02em;
 }
@@ -519,19 +525,19 @@ h1 {
   font-size: 1.8rem;
   font-weight: bold;
   line-height: 1.1;
-  color: #222;
+  color: #fff;
 }
 
 .summary-stat-total {
   font-size: 1rem;
-  color: #777;
+  color: rgba(255, 255, 255, 0.78);
   font-weight: normal;
 }
 
 .summary-stat-sub {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #444;
+  color: rgba(255, 255, 255, 0.92);
   margin-top: 0.1em;
 }
 
