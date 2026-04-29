@@ -532,7 +532,7 @@ git commit -m "feat: track audio play state and expose toggleAudio via GameConte
 - Modify: `app/routes/play.tsx`
 - Modify: `app/styles/game.css`
 
-- [ ] **Step 1: テストを書く**
+- [x] **Step 1: テストを書く**
 
 `app/components/__tests__/SectionHeader.test.tsx` を作成:
 
@@ -585,7 +585,7 @@ describe('SectionHeader', () => {
 });
 ```
 
-- [ ] **Step 2: テストが失敗することを確認する**
+- [x] **Step 2: テストが失敗することを確認する**
 
 ```bash
 npx vitest run app/components/__tests__/SectionHeader.test.tsx
@@ -593,7 +593,7 @@ npx vitest run app/components/__tests__/SectionHeader.test.tsx
 
 期待出力: FAIL（`SectionHeader` が存在しないため）
 
-- [ ] **Step 3: `SectionHeader` コンポーネントを実装する**
+- [x] **Step 3: `SectionHeader` コンポーネントを実装する**
 
 `app/components/SectionHeader.tsx` を作成:
 
@@ -617,7 +617,7 @@ export function SectionHeader({ category, currentIndex, sectionPosition, section
 }
 ```
 
-- [ ] **Step 4: テストが通ることを確認する**
+- [x] **Step 4: テストが通ることを確認する**
 
 ```bash
 npx vitest run app/components/__tests__/SectionHeader.test.tsx
@@ -629,7 +629,7 @@ Test Files  1 passed (1)
 Tests       3 passed (3)
 ```
 
-- [ ] **Step 5: `play.tsx` を更新する**
+- [x] **Step 5: `play.tsx` を更新する**
 
 `app/routes/play.tsx` を以下に置き換える:
 
@@ -679,7 +679,7 @@ export default function Play() {
 }
 ```
 
-- [ ] **Step 6: `game.css` に SectionHeader スタイルを追加する**
+- [x] **Step 6: `game.css` に SectionHeader スタイルを追加する**
 
 `app/styles/game.css` の `/* ---- category / index ---- */` セクション（22〜41行）を以下に置き換える:
 
@@ -723,7 +723,7 @@ export default function Play() {
 }
 ```
 
-- [ ] **Step 7: 全テストを実行する**
+- [x] **Step 7: 全テストを実行する**
 
 ```bash
 npx vitest run
@@ -737,7 +737,7 @@ Tests       57 passed (57)
 
 （既存3ファイル54テスト + SectionHeader新規3テスト = 57）
 
-- [ ] **Step 8: 型チェックを実行する**
+- [x] **Step 8: 型チェックを実行する**
 
 ```bash
 npm run typecheck
@@ -759,7 +759,7 @@ git commit -m "feat: add SectionHeader component shown in both playing and resul
 **Files:**
 - Modify: `app/components/PlayingScreen.tsx`
 
-- [ ] **Step 1: `PlayingScreen.tsx` を全面更新する**
+- [x] **Step 1: `PlayingScreen.tsx` を全面更新する**
 
 `app/components/PlayingScreen.tsx` を以下に置き換える:
 
@@ -839,7 +839,7 @@ export function PlayingScreen({ display, toggleAudio }: Props) {
 }
 ```
 
-- [ ] **Step 2: `game.css` に `.audio-btn` スタイルを追加する**
+- [x] **Step 2: `game.css` に `.audio-btn` スタイルを追加する**
 
 `app/styles/game.css` の末尾に追加:
 
@@ -869,7 +869,7 @@ export function PlayingScreen({ display, toggleAudio }: Props) {
 }
 ```
 
-- [ ] **Step 3: 型チェックを実行する**
+- [x] **Step 3: 型チェックを実行する**
 
 ```bash
 npm run typecheck
@@ -877,7 +877,7 @@ npm run typecheck
 
 期待出力: exit code 0
 
-- [ ] **Step 4: 全テストを実行する**
+- [x] **Step 4: 全テストを実行する**
 
 ```bash
 npx vitest run
@@ -885,7 +885,7 @@ npx vitest run
 
 期待出力: 全テスト PASS
 
-- [ ] **Step 5: 開発サーバーでブラウザ確認する**
+- [x] **Step 5: 開発サーバーでブラウザ確認する**
 
 ```bash
 npm run dev
@@ -900,7 +900,7 @@ npm run dev
 - 音声がある文でボタンをクリックすると再生され「⏸ Stop ( Enter )」に切り替わる
 - Enter キーでも同様に音声の再生/停止ができる
 
-- [ ] **Step 6: コミットする（ユーザーに確認すること）**
+- [x] **Step 6: コミットする（ユーザーに確認すること）**
 
 ```bash
 git add app/components/PlayingScreen.tsx app/styles/game.css

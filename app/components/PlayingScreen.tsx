@@ -3,9 +3,10 @@ import type { GameDisplay } from '../hooks/useGameState';
 
 interface Props {
   display: GameDisplay;
+  toggleAudio: () => void;
 }
 
-function TypingDisplay({ display }: Props) {
+function TypingDisplay({ display }: { display: GameDisplay }) {
   const { typed, enginePosition, targetText, pendingMask } = display;
 
   return (
@@ -30,8 +31,11 @@ function TypingDisplay({ display }: Props) {
   );
 }
 
-export function PlayingScreen({ display }: Props) {
-  const { category, currentIndex, hintText, targetText, translateText, translationMode, escWarning, mode, shiftHintActive, wpm, accuracy, elapsed } = display;
+export function PlayingScreen({ display, toggleAudio }: Props) {
+  const {
+    hintText, targetText, translateText, translationMode,
+    escWarning, mode, shiftHintActive, wpm, accuracy, elapsed, isAudioPlaying,
+  } = display;
 
   const displayedHint = shiftHintActive ? targetText : hintText;
 
@@ -39,16 +43,9 @@ export function PlayingScreen({ display }: Props) {
     <>
       <p className="instruction">
         {mode === 'composition'
-          ? 'Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)／Shift=全文表示'
-          : 'Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)'}
+          ? 'Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)／Shift=全文表示／←→=前後移動'
+          : 'Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)／←→=前後移動'}
       </p>
-
-      <div className="category-index">
-        <div>
-          <span className="category">{category}</span>
-          <span className="index">{currentIndex}</span>
-        </div>
-      </div>
 
       <p className="hint-text">
         <span className="translate-label">
@@ -66,6 +63,11 @@ export function PlayingScreen({ display }: Props) {
       <TypingDisplay display={display} />
 
       <LiveStats wpm={wpm} accuracy={accuracy} elapsed={elapsed} />
+
+      <button className="audio-btn" onClick={toggleAudio}>
+        <span className="audio-icon">{isAudioPlaying ? '⏸' : '▶'}</span>
+        {isAudioPlaying ? 'Stop ( Enter )' : 'Start ( Enter )'}
+      </button>
     </>
   );
 }
