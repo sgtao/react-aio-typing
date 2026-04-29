@@ -18,6 +18,15 @@ function formatTime(ms: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+function barColor(pct: number): string {
+  if (pct < 30)  return 'hsl(195, 70%, 73%)';
+  if (pct < 50)  return 'hsl(172, 55%, 65%)';
+  if (pct < 70)  return 'hsl(152, 52%, 60%)';
+  if (pct < 90)  return 'hsl(142, 52%, 50%)';
+  if (pct < 100) return 'hsl(140, 55%, 43%)';
+  return          'hsl(138, 58%, 35%)';
+}
+
 function CategoryTab() {
   const allSentences = csvLoader.getAll();
   const sessions = historyStorage.getSessions();
@@ -82,7 +91,7 @@ function CategoryTab() {
               <span className="category-item-pct">{pct}%</span>
             </div>
             <div className="progress-bar-wrap">
-              <div className="progress-bar" style={{ width: `${pct}%` }} />
+              <div className="progress-bar" style={{ width: `${pct}%`, backgroundColor: barColor(pct) }} />
             </div>
             <div className="category-item-counts">
               {total} 問 ／ 挑戦済 {attempted} ／ 未挑戦 {total - attempted}
