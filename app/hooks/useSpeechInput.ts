@@ -1,5 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 
+// SpeechRecognition is not in TypeScript's DOM lib, so we define a minimal interface
+interface SpeechRecognitionLike {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: { results: SpeechRecognitionResultList }) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
 export function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -22,7 +34,7 @@ export function useSpeechInput(): UseSpeechInputReturn {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [matchResult, setMatchResult] = useState<'match' | 'mismatch' | null>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   const isSpeechSupported =
     typeof window !== 'undefined' &&
@@ -33,15 +45,12 @@ export function useSpeechInput(): UseSpeechInputReturn {
     const SR =
       (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     if (!SR) return;
-    const recognition = new SR();
+    const recognition = new SR() as SpeechRecognitionLike;
     recognition.lang = 'en-US';
     recognition.continuous = false;
     recognition.interimResults = true;
-    recognition.onresult = (e: Event) => {
-      const event = e as unknown as {
-        results: ArrayLike<{ 0: { transcript: string } }>;
-      };
-      const text = Array.from(event.results)
+    recognition.onresult = (e: { results: SpeechRecognitionResultList }) => {
+      const text = Array.from(e.results)
         .map((r) => r[0].transcript)
         .join('');
       setTranscript(text);
