@@ -478,6 +478,10 @@ const stateRef = useRef<MutableState>({
         clearTimeout(s.escWarningTimer);
         s.escWarningTimer = null;
       }
+      if (s.leftFlashTimer !== null) {
+        clearTimeout(s.leftFlashTimer);
+        s.leftFlashTimer = null;
+      }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
