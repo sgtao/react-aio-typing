@@ -38,14 +38,20 @@ export function useSpeechInput(): UseSpeechInputReturn {
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.onresult = (e: Event) => {
-      const event = e as any;
+      const event = e as unknown as {
+        results: ArrayLike<{ 0: { transcript: string } }>;
+      };
       const text = Array.from(event.results)
-        .map((r: any) => r[0].transcript)
+        .map((r) => r[0].transcript)
         .join('');
       setTranscript(text);
     };
     recognition.onend = () => setIsRecording(false);
-    recognitionRef.current = recognition as any;
+    recognitionRef.current = recognition;
+
+    return () => {
+      recognition.abort();
+    };
   }, []);
 
   function reset() {
