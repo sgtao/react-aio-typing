@@ -446,7 +446,7 @@ const stateRef = useRef<MutableState>({
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (voiceModeRef.current) return;
+      if (voiceModeRef.current && s.phase === 'playing') return;
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       const phase = s.phase;
