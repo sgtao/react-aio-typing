@@ -98,7 +98,14 @@ function SessionsTab({ sessions }: { sessions: SessionRecord[] }) {
 function WeakTab() {
   const weakMap = historyStorage.getWeakMap();
   const allSentences = csvLoader.getAll();
+  const sessions = historyStorage.getSessions();
   const sentenceMap = new Map<number, Sentence>(allSentences.map((s) => [s.no, s]));
+
+  const accByNo = new Map<number, number[]>();
+  sessions.forEach((s) => {
+    if (!accByNo.has(s.no)) accByNo.set(s.no, []);
+    accByNo.get(s.no)!.push(s.accuracy);
+  });
 
   const weakList = Object.entries(weakMap)
     .map(([no, v]) => ({ no: parseInt(no, 10), mistypeCount: v.mistypeCount }))
@@ -113,6 +120,10 @@ function WeakTab() {
     <>
       {weakList.map((w) => {
         const sentence = sentenceMap.get(w.no);
+        const accs = accByNo.get(w.no) ?? [];
+        const avgAcc = accs.length > 0
+          ? Math.round(accs.reduce((a, b) => a + b) / accs.length)
+          : null;
         return (
           <div key={w.no} className="weak-item">
             <div className="weak-item-info">
@@ -126,7 +137,10 @@ function WeakTab() {
                 </div>
               )}
             </div>
-            <div className="weak-count">{w.mistypeCount} ミス</div>
+            <div className="weak-count">
+              <div>{w.mistypeCount} ミス</div>
+              {avgAcc !== null && <div className="weak-avg-acc">avg {avgAcc}%</div>}
+            </div>
           </div>
         );
       })}

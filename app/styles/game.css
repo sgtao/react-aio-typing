@@ -651,10 +651,21 @@ h1 {
 }
 
 .weak-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.weak-count > div:first-child {
   font-size: 13px;
   font-weight: bold;
   color: #cc3030;
-  white-space: nowrap;
+}
+
+.weak-avg-acc {
+  font-size: 0.82rem;
+  color: #888;
 }
 
 /* -- history button in menu -- */
