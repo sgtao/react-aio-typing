@@ -12,6 +12,7 @@ interface GameContextValue {
   settings: Settings;
   updateSettings: (partial: Partial<Settings>) => void;
   startGame: () => void;
+  startGameWithCategory: (cat: string) => void;
   cleanup: () => void;
   toggleAudio: () => void;
 }

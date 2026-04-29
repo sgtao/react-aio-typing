@@ -106,10 +106,9 @@ function SessionsTab({ sessions }: { sessions: SessionRecord[] }) {
   );
 }
 
-function WeakTab() {
+function WeakTab({ sessions }: { sessions: SessionRecord[] }) {
   const weakMap = historyStorage.getWeakMap();
   const allSentences = csvLoader.getAll();
-  const sessions = historyStorage.getSessions();
   const sentenceMap = new Map<number, Sentence>(allSentences.map((s) => [s.no, s]));
 
   const accByNo = new Map<number, number[]>();
@@ -193,11 +192,7 @@ export function HistoryScreen() {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [categoryToReset, setCategoryToReset] = useState<string | null>(null);
-  const {startGameWithCategory} = useGameContext();
-
-  function handleCategoryStart(cat: string) {
-    startGameWithCategory(cat);
-  }
+  const { startGameWithCategory } = useGameContext();
 
   const allSentences = csvLoader.getAll();
   const sessions = historyStorage.getSessions();
@@ -283,11 +278,11 @@ export function HistoryScreen() {
           {activeTab === 'category' && (
             <CategoryTab
               onCategoryResetRequest={(cat) => setCategoryToReset(cat)}
-              onCategoryStart={handleCategoryStart}
+              onCategoryStart={startGameWithCategory}
             />
           )}
           {activeTab === 'sessions' && <SessionsTab sessions={sessions} />}
-          {activeTab === 'weak' && <WeakTab />}
+          {activeTab === 'weak' && <WeakTab sessions={sessions} />}
         </div>
       )}
 

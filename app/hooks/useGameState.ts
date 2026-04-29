@@ -61,15 +61,6 @@ interface MutableState {
   leftFlashTimer: ReturnType<typeof setTimeout> | null;
 }
 
-interface GameContextValue {
-  display: GameDisplay;
-  settings: Settings;
-  updateSettings: (partial: Partial<Settings>) => void;
-  startGame: () => void;
-  startGameWithCategory: (cat: string) => void;
-  cleanup: () => void;
-  toggleAudio: () => void;
-}
 
 function sentenceToContent(s: Sentence): ContentItem {
   return {
