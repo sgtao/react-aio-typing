@@ -130,6 +130,8 @@ const stateRef = useRef<MutableState>({
   const startGameWithCategoryRef = useRef<(cat: string) => void>(() => {});
   const audioListenerCleanupRef = useRef<(() => void) | null>(null);
   const toggleAudioRef = useRef<() => void>(() => {});
+  const voiceModeRef = useRef(false);
+  const nextContentFnRef = useRef<() => void>(() => {});
 
   settingsRef.current = settings;
 
@@ -414,6 +416,8 @@ const stateRef = useRef<MutableState>({
     }
 
     startGameFnRef.current = startGame;
+    nextContentFnRef.current = nextContent;
+
     function startGameWithCategory(cat: string) {
       settingsRef.current = { ...settingsRef.current, category: cat };
       startGameFnRef.current();
@@ -442,6 +446,7 @@ const stateRef = useRef<MutableState>({
     }
 
     function handleKeyDown(e: KeyboardEvent) {
+      if (voiceModeRef.current) return;
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       const phase = s.phase;
@@ -586,6 +591,8 @@ const stateRef = useRef<MutableState>({
   const cleanup = useCallback(() => cleanupFnRef.current(), []);
   const toggleAudio = useCallback(() => toggleAudioRef.current(), []);
   const startGameWithCategory = useCallback((cat: string) => startGameWithCategoryRef.current(cat), []);
+  const goToNextContent = useCallback(() => nextContentFnRef.current(), []);
+  const setVoiceMode = useCallback((active: boolean) => { voiceModeRef.current = active; }, []);
 
-  return { display, startGame, startGameWithCategory, cleanup, toggleAudio };
+  return { display, startGame, startGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode };
 }
