@@ -123,20 +123,21 @@ function WeakTab() {
 }
 
 function ResetDialog({
+  title,
+  body,
   onCancel,
   onConfirm,
 }: {
+  title: string;
+  body: string;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
-        <p className="modal-title">学習履歴を全てリセット</p>
-        <p className="modal-body">
-          セッション履歴と苦手な文を全て削除します。<br />
-          この操作は元に戻せません。
-        </p>
+        <p className="modal-title">{title}</p>
+        <p className="modal-body">{body}</p>
         <div className="modal-actions">
           <button className="modal-cancel-btn" onClick={onCancel}>
             キャンセル
@@ -197,6 +198,8 @@ export function HistoryScreen() {
 
       {showResetDialog && (
         <ResetDialog
+          title="学習履歴を全てリセット"
+          body={"セッション履歴と苦手な文を全て削除します。\nこの操作は元に戻せません。"}
           onCancel={() => setShowResetDialog(false)}
           onConfirm={handleReset}
         />
