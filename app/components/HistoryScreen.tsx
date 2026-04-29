@@ -31,10 +31,44 @@ function CategoryTab() {
   const totalAll = allSentences.length;
   const attemptedAll = allSentences.filter((s) => attemptedNos.has(s.no)).length;
 
+  const completedCategories = categories.filter((cat) =>
+    csvLoader.getByCategory(cat).every((s) => attemptedNos.has(s.no))
+  ).length;
+  const totalCategories = categories.length;
+
+  const avgWpm = sessions.length > 0
+    ? Math.round(sessions.reduce((sum, s) => sum + s.wpm, 0) / sessions.length)
+    : null;
+  const avgAccuracy = sessions.length > 0
+    ? Math.round(sessions.reduce((sum, s) => sum + s.accuracy, 0) / sessions.length)
+    : null;
+
   return (
     <>
-      <div className="category-summary">
-        全 {totalAll} 問 ／ 挑戦済 {attemptedAll} ／ 未挑戦 {totalAll - attemptedAll}
+      <div className="category-summary-stats">
+        <div className="summary-stat-card">
+          <div className="summary-stat-label">挑戦数</div>
+          <div className="summary-stat-value">
+            {attemptedAll}
+            <span className="summary-stat-total"> / {totalAll}</span>
+          </div>
+        </div>
+        <div className="summary-stat-card">
+          <div className="summary-stat-label">セクション完了</div>
+          <div className="summary-stat-value">
+            {completedCategories}
+            <span className="summary-stat-total"> / {totalCategories}</span>
+          </div>
+        </div>
+        <div className="summary-stat-card">
+          <div className="summary-stat-label">平均スコア</div>
+          <div className="summary-stat-value">
+            {avgWpm !== null ? `${avgWpm} WPM` : '—'}
+          </div>
+          <div className="summary-stat-sub">
+            {avgAccuracy !== null ? `${avgAccuracy}%` : '—'}
+          </div>
+        </div>
       </div>
       {categories.map((cat) => {
         const catSentences = csvLoader.getByCategory(cat);

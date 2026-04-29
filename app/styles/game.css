@@ -442,12 +442,45 @@ h1 {
 
 /* -- category tab -- */
 
-.category-summary {
+.category-summary-stats {
+  display: flex;
+  gap: 0.6em;
+  margin-bottom: 1em;
+}
+
+.summary-stat-card {
+  flex: 1;
   background: #f0f0f0;
-  border-radius: 0.3em;
-  padding: 0.5em 0.8em;
-  font-size: 14px;
-  margin-bottom: 0.8em;
+  border-radius: 0.4em;
+  padding: 0.6em 0.8em;
+  text-align: center;
+}
+
+.summary-stat-label {
+  font-size: 0.72rem;
+  color: #999;
+  margin-bottom: 0.15em;
+  letter-spacing: 0.02em;
+}
+
+.summary-stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1.1;
+  color: #222;
+}
+
+.summary-stat-total {
+  font-size: 1rem;
+  color: #aaa;
+  font-weight: normal;
+}
+
+.summary-stat-sub {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #555;
+  margin-top: 0.1em;
 }
 
 .category-item {
