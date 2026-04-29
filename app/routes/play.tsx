@@ -5,10 +5,24 @@ import { PlayingScreen } from '../components/PlayingScreen';
 import { ResultScreen } from '../components/ResultScreen';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { SectionHeader } from '../components/SectionHeader';
+import { useSpeechInput } from '../hooks/useSpeechInput';
 
 export default function Play() {
-  const { display, cleanup, toggleAudio } = useGameContext();
+  const { display, cleanup, toggleAudio, goToNextContent, setVoiceMode } = useGameContext();
   const navigate = useNavigate();
+
+  const {
+    isVoiceMode,
+    isRecording,
+    transcript,
+    matchResult,
+    toggleVoiceMode,
+    startRecording,
+    stopRecording,
+    judge,
+    reset,
+    isSpeechSupported,
+  } = useSpeechInput();
 
   useEffect(() => {
     if (display.category === '') {
@@ -22,8 +36,26 @@ export default function Play() {
     };
   }, [cleanup]);
 
+  useEffect(() => {
+    setVoiceMode(isVoiceMode);
+  }, [isVoiceMode, setVoiceMode]);
+
+  const voiceProps = {
+    isVoiceMode,
+    isRecording,
+    transcript,
+    matchResult,
+    onToggleVoiceMode: toggleVoiceMode,
+    onStartRecording: startRecording,
+    onStopRecording: stopRecording,
+    onJudge: () => judge(display.targetText),
+    onReset: reset,
+    onNext: goToNextContent,
+    isSpeechSupported,
+  };
+
   const content = (() => {
-    if (display.phase === 'playing') return <PlayingScreen display={display} toggleAudio={toggleAudio} />;
+    if (display.phase === 'playing') return <PlayingScreen display={display} toggleAudio={toggleAudio} voice={voiceProps} />;
     if (display.phase === 'result') return <ResultScreen display={display} />;
     return null;
   })();
