@@ -60,6 +60,16 @@ function clearAll(): void {
   clearWeak();
 }
 
+function clearByCategory(category: string, nos: number[]): void {
+  const sessions = getSessions().filter((s) => s.category !== category);
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+
+  const map = getWeakMap();
+  const nosSet = new Set(nos);
+  for (const no of nosSet) delete map[no];
+  localStorage.setItem(WEAK_KEY, JSON.stringify(map));
+}
+
 export const historyStorage = {
   getSessions,
   saveSession,
@@ -68,4 +78,5 @@ export const historyStorage = {
   recordMistypes,
   clearWeak,
   clearAll,
+  clearByCategory,
 };

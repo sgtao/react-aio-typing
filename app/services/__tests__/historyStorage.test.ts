@@ -159,3 +159,37 @@ describe('clearAll', () => {
     expect(historyStorage.getWeakMap()).toEqual({});
   });
 });
+
+// ---------------------------------------------------------------------------
+// clearByCategory
+// ---------------------------------------------------------------------------
+
+describe('clearByCategory', () => {
+  it('対象カテゴリのセッションを削除し、他カテゴリのセッションは残す', () => {
+    const s1 = { ...session, no: 1, category: '01_時制' };
+    const s2 = { ...session, no: 2, category: '02_態' };
+    historyStorage.saveSession(s1);
+    historyStorage.saveSession(s2);
+    historyStorage.clearByCategory('01_時制', [1]);
+    const remaining = historyStorage.getSessions();
+    expect(remaining.some((s) => s.category === '01_時制')).toBe(false);
+    expect(remaining.some((s) => s.category === '02_態')).toBe(true);
+  });
+
+  it('対象 nos の weakMap エントリを削除し、他 nos は残す', () => {
+    historyStorage.recordMistypes(1, 3);
+    historyStorage.recordMistypes(2, 5);
+    historyStorage.clearByCategory('01_時制', [1]);
+    const map = historyStorage.getWeakMap();
+    expect(map[1]).toBeUndefined();
+    expect(map[2]).toBeDefined();
+  });
+
+  it('sessions と weakMap 両方を同時にクリアする', () => {
+    historyStorage.saveSession({ ...session, no: 1, category: '01_時制' });
+    historyStorage.recordMistypes(1, 3);
+    historyStorage.clearByCategory('01_時制', [1]);
+    expect(historyStorage.getSessions()).toEqual([]);
+    expect(historyStorage.getWeakMap()).toEqual({});
+  });
+});
