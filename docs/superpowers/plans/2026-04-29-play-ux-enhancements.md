@@ -299,7 +299,7 @@ git commit -m "feat: replace contentsIndex with playOrder and add loadContent he
 **Files:**
 - Modify: `app/hooks/useGameState.ts`
 
-- [ ] **Step 1: `triggerFlash` 関数を追加する**
+- [x] **Step 1: `triggerFlash` 関数を追加する**
 
 `handleKeyDown` 関数の定義の直前に追加:
 
@@ -314,7 +314,7 @@ function triggerFlash() {
 }
 ```
 
-- [ ] **Step 2: `handleKeyDown` の playing フェーズに ArrowLeft/ArrowRight を追加する**
+- [x] **Step 2: `handleKeyDown` の playing フェーズに ArrowLeft/ArrowRight を追加する**
 
 playing フェーズの `if (e.key === 'Escape')` ブロックの直前に追加:
 
@@ -343,7 +343,7 @@ if (e.key === 'ArrowRight') {
 }
 ```
 
-- [ ] **Step 3: `useEffect` の cleanup に `leftFlashTimer` クリアを追加する**
+- [x] **Step 3: `useEffect` の cleanup に `leftFlashTimer` クリアを追加する**
 
 `useEffect` の return 内（`escWarningTimer` の clearTimeout の後）に追加:
 
@@ -354,7 +354,7 @@ if (s.leftFlashTimer !== null) {
 }
 ```
 
-- [ ] **Step 4: 型チェックを実行する**
+- [x] **Step 4: 型チェックを実行する**
 
 ```bash
 npm run typecheck
@@ -362,7 +362,7 @@ npm run typecheck
 
 期待出力: exit code 0
 
-- [ ] **Step 5: 開発サーバーで左/右キーを確認する**
+- [x] **Step 5: 開発サーバーで左/右キーを確認する**
 
 ```bash
 npm run dev
@@ -372,7 +372,7 @@ npm run dev
 - playing 中に左キー: リセット済み → 前の文に移動（最初の文では `leftFlash: true` → DevTools で確認）
 - playing 中に右キー: 次の文に移動（最後の文では `leftFlash: true`）
 
-- [ ] **Step 6: コミットする（ユーザーに確認すること）**
+- [x] **Step 6: コミットする（ユーザーに確認すること）**
 
 ```bash
 git add app/hooks/useGameState.ts

@@ -380,6 +380,14 @@ const stateRef = useRef<MutableState>({
     };
 
     // --- event handlers ---
+    function triggerFlash() {
+      if (s.leftFlashTimer !== null) clearTimeout(s.leftFlashTimer);
+      setDisplay((prev) => ({ ...prev, leftFlash: true }));
+      s.leftFlashTimer = setTimeout(() => {
+        s.leftFlashTimer = null;
+        setDisplay((prev) => ({ ...prev, leftFlash: false }));
+      }, 500);
+    }
 
     function handleKeyDown(e: KeyboardEvent) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -398,6 +406,28 @@ const stateRef = useRef<MutableState>({
       }
 
       // playing
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const st = s.engine ? s.engine.getDisplayState() : null;
+        const typedManual = st ? st.typed.filter((c) => !c.auto).length : 0;
+        if (typedManual > 0) {
+          resetCurrentContent();
+        } else if (s.currentContentIdx > 0) {
+          loadContent(s.currentContentIdx - 1);
+        } else {
+          triggerFlash();
+        }
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (s.currentContentIdx < s.playOrder.length - 1) {
+          loadContent(s.currentContentIdx + 1);
+        } else {
+          triggerFlash();
+        }
+        return;
+      }
       if (e.key === 'Escape') {
         e.preventDefault();
         const st = s.engine ? s.engine.getDisplayState() : null;
@@ -437,6 +467,10 @@ const stateRef = useRef<MutableState>({
       if (s.escWarning) {
         if (s.escWarningTimer !== null) {
           clearTimeout(s.escWarningTimer);
+          if (s.leftFlashTimer !== null) {
+            clearTimeout(s.leftFlashTimer);
+            s.leftFlashTimer = null;
+          }
           s.escWarningTimer = null;
         }
         s.escWarning = false;
