@@ -116,26 +116,28 @@ export function MenuScreen({ categories, settings, onUpdateSettings, onStart, on
         )}
       </div>
 
-      <button
-        className="start-btn"
-        disabled={!settings.category}
-        onClick={(e) => {
-          e.stopPropagation();
-          onStart();
-        }}
-      >
-        START (Enter)
-      </button>
+      <div className="menu-bar">
+        <button
+          className="start-btn"
+          disabled={!settings.category}
+          onClick={(e) => {
+            e.stopPropagation();
+            onStart();
+          }}
+        >
+          START (Enter)
+        </button>
 
-      <button
-        className="history-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          onHistory();
-        }}
-      >
-        📋 学習履歴
-      </button>
+        <button
+          className="history-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onHistory();
+          }}
+        >
+          📋 学習履歴
+        </button>
+      </div>
     </>
   );
 }

@@ -228,6 +228,11 @@ h1 {
 }
 
 /* ---- start button ---- */
+.menu-bar {
+  display: inline-flex;
+  margin-bottom: 0.5em;
+  gap: 1rem;
+}
 
 .start-btn {
   font-family: 'Courier New', monospace;
@@ -645,8 +650,8 @@ h1 {
 .history-btn {
   font-family: 'Courier New', monospace;
   font-size: 16px;
-  padding: 0.4em 1.5em;
-  margin: 0.8em 0 0.3em;
+  padding: 0.5em 2em;
+  margin: 0.8em 0;
   background: #f0f8ff;
   border: 1px solid #5ba3c9;
   border-radius: 0.5em;
