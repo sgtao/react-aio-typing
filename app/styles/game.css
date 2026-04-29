@@ -568,16 +568,26 @@ h1 {
 }
 
 .progress-bar-wrap {
-  background: #e8e8e8;
-  border-radius: 3px;
-  height: 8px;
+  background: #f0fdf4;
+  border-radius: 5px;
+  height: 10px;
   overflow: hidden;
   margin-bottom: 2px;
 }
 
 .progress-bar {
   height: 100%;
-  border-radius: 3px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, rgba(7, 174, 234, 1), rgba(43, 245, 152, 1));
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  transform: translateX(-100%);
+  animation: progress-gradient 0.8s ease-out forwards;
+}
+
+@keyframes progress-gradient {
+  0%   { transform: translateX(-100%); }
+  70%  { transform: translateX(0%); }
+  100% { transform: translateX(0%); }
 }
 
 .category-item-counts {
