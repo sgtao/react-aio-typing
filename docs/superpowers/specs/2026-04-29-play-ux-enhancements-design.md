@@ -14,7 +14,7 @@
 
 | ファイル | 変化 | 内容 |
 |---------|------|------|
-| `app/hooks/useGameState.ts` | 変更 | GameDisplay 拡張・left/right ハンドラ・audioリスナー・toggleAudio 公開 |
+| `app/hooks/useGameState.ts` | 変更 | GameDisplay 拡張・playOrder 方式・left/right ハンドラ・audioリスナー・toggleAudio 公開 |
 | `app/context/GameContext.tsx` | 変更 | toggleAudio をコンテキストに追加 |
 | `app/routes/play.tsx` | 変更 | SectionHeader を phase 問わずレンダリング |
 | `app/components/SectionHeader.tsx` | 新規 | セクション・位置ヘッダーコンポーネント |
@@ -30,82 +30,54 @@
 `app/hooks/useGameState.ts` の `GameDisplay` インターフェースに以下を追加する:
 
 ```typescript
-sectionPosition: number;  // カテゴリ内の現在位置（1始まり。startGame前は0）
+sectionPosition: number;  // playOrder 内の現在位置（1始まり。startGame前は0）
 sectionTotal: number;     // カテゴリ内の総文数（startGame前は0）
 isAudioPlaying: boolean;  // 現在のオーディオ再生状態
-leftFlash: boolean;       // 左境界フラッシュトリガー（500ms で自動リセット）
+leftFlash: boolean;       // 境界フラッシュトリガー（左右共用、500ms で自動リセット）
 ```
 
 初期値はすべて `0` / `false`。
 
-### 2. MutableState の拡張
+### 2. MutableState の変更
+
+`contentsIndex: number[]` を削除し、以下に置き換える:
 
 ```typescript
-currentContentIdx: number;  // s.contents 配列内の現在インデックス（init: -1）
+// 削除:
+// contentsIndex: number[];
+
+// 追加:
+playOrder: number[];        // s.contents へのインデックス列。startGame時に1度だけ生成
+currentContentIdx: number;  // playOrder 内の現在位置（-1 = 未開始）
 leftFlashTimer: ReturnType<typeof setTimeout> | null;
 ```
 
-### 3. SectionHeader コンポーネント
-
-`app/components/SectionHeader.tsx` を新規作成:
-
-```tsx
-interface Props {
-  category: string;
-  currentIndex: string;
-  sectionPosition: number;
-  sectionTotal: number;
-  leftFlash: boolean;
-}
-
-export function SectionHeader({ category, currentIndex, sectionPosition, sectionTotal, leftFlash }: Props) {
-  return (
-    <div className={`section-header${leftFlash ? ' section-header--flash' : ''}`}>
-      <span className="section-category">{category}</span>
-      <span className="section-index">{currentIndex}</span>
-      <span className="section-position">{sectionPosition} / {sectionTotal}</span>
-    </div>
-  );
-}
-```
-
-### 4. play.tsx の変更
-
-`SectionHeader` を phase 条件外でレンダリングする:
-
-```tsx
-return (
-  <ProtectedRoute>
-    <SectionHeader
-      category={display.category}
-      currentIndex={display.currentIndex}
-      sectionPosition={display.sectionPosition}
-      sectionTotal={display.sectionTotal}
-      leftFlash={display.leftFlash}
-    />
-    {content}
-  </ProtectedRoute>
-);
-```
-
-### 5. 左/右キーナビゲーション
-
-#### キー動作（playing フェーズのみ）
-
-| 状況 | 左キー | 右キー |
-|------|--------|--------|
-| 入力中（manual typed > 0） | 現在文をリセット | `currentIdx + 1` へジャンプ |
-| リセット済み（typed = 0）かつ idx > 0 | `currentIdx - 1` へジャンプ | — |
-| リセット済みかつ idx = 0（左端） | 赤フラッシュ（移動なし） | `currentIdx + 1` へジャンプ |
-| 右端（idx = total - 1） | 上記に準じる | 赤フラッシュ（移動なし） |
-
-#### `navigateToIdx(idx)` ヘルパー
-
-左右ナビ共通のロード処理:
+**`playOrder` の生成（`startGame()` 内）:**
 
 ```typescript
-function navigateToIdx(idx: number) {
-  const content = s.contents[idx];
+s.contents = sentences.map(sentenceToContent);
+s.playOrder = s.contents.map((_, i) => i);  // [0, 1, 2, ..., N-1]
+
+if (cfg.order === 'random') {
+  // Fisher-Yates shuffle
+  for (let i = s.playOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [s.playOrder[i], s.playOrder[j]] = [s.playOrder[j], s.playOrder[i]];
+  }
+}
+s.currentContentIdx = -1;
+```
+
+sequential では `[0, 1, 2, ...]`、random では Fisher-Yates でシャッフルした配列になる。
+
+### 3. `loadContent(pos)` ヘルパー
+
+nextContent / prevContent / forwardContent の共通ロード処理:
+
+```typescript
+function loadContent(pos: number) {
+  const contentIdx = s.playOrder[pos];
+  const content = s.contents[contentIdx];
   const cfg = settingsRef.current;
   const hintText = computeHintText(content);
   const pendingMask = cfg.mode === 'composition' ? buildPendingMask(content.word, cfg.hintLevel) : null;
@@ -114,7 +86,7 @@ function navigateToIdx(idx: number) {
   const st = engine.getDisplayState();
 
   stopAudio(s.currentIndex);
-  s.currentContentIdx = idx;
+  s.currentContentIdx = pos;
   s.currentIndex = content.index;
   s.currentContent = content;
   s.engine = engine;
@@ -138,31 +110,83 @@ function navigateToIdx(idx: number) {
     accuracy: 100,
     elapsed: 0,
     results: null,
-    sectionPosition: idx + 1,
+    sectionPosition: pos + 1,
     isAudioPlaying: false,
     shiftHintActive: false,
   }));
 }
 ```
 
-- contentsIndex キューは消費しない（通常進行のキューと独立）
-- `prevContent()`: `navigateToIdx(s.currentContentIdx - 1)` を呼ぶ（境界チェック後）
-- `forwardContent()`: `navigateToIdx(s.currentContentIdx + 1)` を呼ぶ（境界チェック後）
-
-#### nextContent() の変更点
-
-通常進行（文完了→次へ）でも `currentContentIdx` と `sectionPosition` を更新する:
+既存の `nextContent()` はこの `loadContent` を使うよう書き換える:
 
 ```typescript
-// nextContent() 内の splice 直後に追加
-s.currentContentIdx = idx;  // splice で取り出した contentsIndex 値が s.contents[idx] を指す
-// setDisplay の追加フィールド:
-sectionPosition: s.currentContentIdx + 1,
+function nextContent() {
+  const nextPos = s.currentContentIdx + 1;
+  if (nextPos >= s.playOrder.length) {
+    gotoMenu();
+    return;
+  }
+  loadContent(nextPos);
+}
 ```
 
-また `nextContent()` 内でも `attachAudioListeners(content.index)` を呼ぶ。
+`startGame()` 内の最初のロードも `loadContent(0)` を呼ぶ（`nextContent()` の代わり）。
 
-#### leftFlash / rightFlash
+### 4. SectionHeader コンポーネント
+
+`app/components/SectionHeader.tsx` を新規作成:
+
+```tsx
+interface Props {
+  category: string;
+  currentIndex: string;
+  sectionPosition: number;
+  sectionTotal: number;
+  leftFlash: boolean;
+}
+
+export function SectionHeader({ category, currentIndex, sectionPosition, sectionTotal, leftFlash }: Props) {
+  return (
+    <div className={`section-header${leftFlash ? ' section-header--flash' : ''}`}>
+      <span className="section-category">{category}</span>
+      <span className="section-index">{currentIndex}</span>
+      <span className="section-position">{sectionPosition} / {sectionTotal}</span>
+    </div>
+  );
+}
+```
+
+### 5. play.tsx の変更
+
+`SectionHeader` を phase 条件外でレンダリングする:
+
+```tsx
+return (
+  <ProtectedRoute>
+    <SectionHeader
+      category={display.category}
+      currentIndex={display.currentIndex}
+      sectionPosition={display.sectionPosition}
+      sectionTotal={display.sectionTotal}
+      leftFlash={display.leftFlash}
+    />
+    {content}
+  </ProtectedRoute>
+);
+```
+
+### 6. 左/右キーナビゲーション
+
+#### キー動作（playing フェーズのみ）
+
+| 状況 | 左キー | 右キー |
+|------|--------|--------|
+| 入力中（manual typed > 0） | 現在文をリセット | `loadContent(currentContentIdx + 1)` |
+| リセット済み（typed = 0）かつ idx > 0 | `loadContent(currentContentIdx - 1)` | `loadContent(currentContentIdx + 1)` |
+| リセット済みかつ idx = 0（左端） | 赤フラッシュ（移動なし） | `loadContent(currentContentIdx + 1)` |
+| 右端（idx = playOrder.length - 1） | 上記に準じる | 赤フラッシュ（移動なし） |
+
+#### `triggerFlash()` ヘルパー
 
 ```typescript
 function triggerFlash() {
@@ -175,8 +199,6 @@ function triggerFlash() {
 }
 ```
 
-左端・右端の両方に `triggerFlash()` を使用する（フィールド名は `leftFlash` のまま、左右境界共用）。
-
 #### handleKeyDown への追加（playing フェーズ）
 
 ```typescript
@@ -188,7 +210,7 @@ if (e.key === 'ArrowLeft') {
   if (typedManual > 0) {
     resetCurrentContent();
   } else if (s.currentContentIdx > 0) {
-    prevContent();
+    loadContent(s.currentContentIdx - 1);
   } else {
     triggerFlash();
   }
@@ -196,8 +218,8 @@ if (e.key === 'ArrowLeft') {
 }
 if (e.key === 'ArrowRight') {
   e.preventDefault();
-  if (s.currentContentIdx < s.contents.length - 1) {
-    forwardContent();
+  if (s.currentContentIdx < s.playOrder.length - 1) {
+    loadContent(s.currentContentIdx + 1);
   } else {
     triggerFlash();
   }
@@ -205,7 +227,7 @@ if (e.key === 'ArrowRight') {
 }
 ```
 
-### 6. 音声再生/停止ボタン
+### 7. 音声再生/停止ボタン
 
 #### `attachAudioListeners(indexName)` ヘルパー
 
@@ -239,7 +261,7 @@ function attachAudioListeners(indexName: string) {
 }
 ```
 
-`attachAudioListeners` は `nextContent()` / `navigateToIdx()` のコンテンツ切替時に呼ぶ。`resetCurrentContent()` では不要（`stopAudio` が `pause` イベントを発火し、既存リスナーが `isAudioPlaying: false` に自動更新するため）。
+`attachAudioListeners` は `loadContent()` 内で呼ぶ。`resetCurrentContent()` では不要（`stopAudio` が `pause` イベントを発火し、既存リスナーが `isAudioPlaying: false` に自動更新するため）。
 
 #### toggleAudio の公開
 
@@ -275,12 +297,12 @@ interface GameContextValue {
 
 `PlayingScreen` の props に `toggleAudio: () => void` と `isAudioPlaying: boolean` を追加。
 
-### 7. PlayingScreen の変更
+### 8. PlayingScreen の変更
 
 - 既存の `.category-index` div を削除（SectionHeader に移行）
 - 音声ボタンを追加
 
-### 8. CSS
+### 9. CSS
 
 ```css
 /* SectionHeader */
@@ -290,7 +312,6 @@ interface GameContextValue {
   gap: 0.5rem;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  transition: background-color 0.1s;
 }
 .section-header--flash {
   animation: flash-red 0.5s ease;
@@ -328,15 +349,46 @@ interface GameContextValue {
 
 ---
 
+## データフロー図
+
+```
+startGame()
+  └─ Fisher-Yates shuffle → playOrder = [5, 12, 3, ...]
+  └─ currentContentIdx = -1
+  └─ loadContent(0)  ←── 最初の文
+
+Enter / 文完了 → nextContent()
+  └─ currentContentIdx++ → loadContent(currentContentIdx)
+  └─ currentContentIdx >= playOrder.length → gotoMenu()
+
+右キー（playing）
+  └─ currentContentIdx < playOrder.length - 1 → loadContent(currentContentIdx + 1)
+  └─ else → triggerFlash()
+
+左キー（playing）
+  └─ typed > 0 → resetCurrentContent()
+  └─ typed = 0 && idx > 0 → loadContent(currentContentIdx - 1)
+  └─ typed = 0 && idx = 0 → triggerFlash()
+
+loadContent(pos)
+  └─ contentIdx = playOrder[pos]
+  └─ content = contents[contentIdx]
+  └─ sectionPosition = pos + 1
+  └─ sectionTotal = playOrder.length
+```
+
+---
+
 ## 動作まとめ
 
 | 操作 | 結果 |
 |------|------|
 | playing/result いずれも | SectionHeader にカテゴリ・インデックス・N/M を表示 |
+| N/M の意味 | playOrder 内の位置（sequential: CSV順、random: シャッフル順） |
 | 左キー（入力中） | 現在文リセット |
-| 左キー（リセット済み・idx>0） | 前の文へ移動 |
+| 左キー（リセット済み・idx>0） | playOrder 上の前の文へ移動 |
 | 左キー（idx=0） | 赤フラッシュ |
-| 右キー（idx<total-1） | 次の文へ移動 |
+| 右キー（idx<total-1） | playOrder 上の次の文へ移動 |
 | 右キー（idx=total-1） | 赤フラッシュ |
 | 音声ボタン / Enter | 音声再生・停止トグル |
 | ボタン表示 | 再生中は「⏸ Stop ( Enter )」、停止中は「▶ Start ( Enter )」 |
