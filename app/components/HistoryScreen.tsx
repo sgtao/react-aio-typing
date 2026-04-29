@@ -4,6 +4,7 @@ import { historyStorage } from '../services/historyStorage';
 import type { SessionRecord } from '../services/historyStorage';
 import { csvLoader } from '../services/csvLoader';
 import type { Sentence } from '../services/csvLoader';
+import { useGameContext } from '../context/GameContext';
 
 type Tab = 'category' | 'sessions' | 'weak';
 
@@ -26,9 +27,11 @@ function barColor(pct: number): string {
   return          'hsl(138, 58%, 35%)';
 }
 
-function CategoryTab({ onCategoryResetRequest }: {
+function CategoryTab({ onCategoryResetRequest, onCategoryStart }: {
   onCategoryResetRequest: (cat: string) => void;
+  onCategoryStart: (cat: string) => void;
 }) {
+
   const sessions = historyStorage.getSessions();
   const attemptedNos = new Set(sessions.map((s) => s.no));
   const categories = csvLoader.getCategories();
@@ -47,7 +50,15 @@ function CategoryTab({ onCategoryResetRequest }: {
         return (
           <div key={cat} className="category-item">
             <div className="category-item-header">
-              <span className="category-item-name">{cat}</span>
+              <span
+                className="category-item-name"
+                role="button"
+                tabIndex={0}
+                onClick={() => onCategoryStart(cat)}
+                onKeyDown={(e) => e.key === 'Enter' && onCategoryStart(cat)}
+              >
+                {cat}
+              </span>
               <div className="category-item-header-right">
                 <span className="category-item-pct">{pct}%</span>
                 <button
@@ -182,6 +193,11 @@ export function HistoryScreen() {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [categoryToReset, setCategoryToReset] = useState<string | null>(null);
+  const {startGameWithCategory} = useGameContext();
+
+  function handleCategoryStart(cat: string) {
+    startGameWithCategory(cat);
+  }
 
   const allSentences = csvLoader.getAll();
   const sessions = historyStorage.getSessions();
@@ -265,7 +281,10 @@ export function HistoryScreen() {
       {activeTab !== null && (
         <div className="history-content" key={resetKey}>
           {activeTab === 'category' && (
-            <CategoryTab onCategoryResetRequest={(cat) => setCategoryToReset(cat)} />
+            <CategoryTab
+              onCategoryResetRequest={(cat) => setCategoryToReset(cat)}
+              onCategoryStart={handleCategoryStart}
+            />
           )}
           {activeTab === 'sessions' && <SessionsTab sessions={sessions} />}
           {activeTab === 'weak' && <WeakTab />}

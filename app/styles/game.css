@@ -557,6 +557,12 @@ h1 {
 
 .category-item-name {
   font-weight: bold;
+  cursor: pointer;
+}
+
+.category-item-name:hover {
+  color: #3b82f6;
+  text-decoration: underline;
 }
 
 .category-item-pct {
