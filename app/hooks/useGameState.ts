@@ -285,6 +285,30 @@ const stateRef = useRef<MutableState>({
       }));
     }
 
+    function attachAudioListeners(indexName: string) {
+      if (audioListenerCleanupRef.current) {
+        audioListenerCleanupRef.current();
+        audioListenerCleanupRef.current = null;
+      }
+      const el = audio.get(indexName);
+      if (!el) {
+        setDisplay((prev) => ({ ...prev, isAudioPlaying: false }));
+        return;
+      }
+      const onPlay  = () => setDisplay((prev) => ({ ...prev, isAudioPlaying: true }));
+      const onPause = () => setDisplay((prev) => ({ ...prev, isAudioPlaying: false }));
+      const onEnded = () => setDisplay((prev) => ({ ...prev, isAudioPlaying: false }));
+      el.addEventListener('play',  onPlay);
+      el.addEventListener('pause', onPause);
+      el.addEventListener('ended', onEnded);
+      audioListenerCleanupRef.current = () => {
+        el.removeEventListener('play',  onPlay);
+        el.removeEventListener('pause', onPause);
+        el.removeEventListener('ended', onEnded);
+      };
+      setDisplay((prev) => ({ ...prev, isAudioPlaying: !el.paused && !el.ended }));
+    }
+
     function loadContent(pos: number) {
       const contentIdx = s.playOrder[pos];
       const content = s.contents[contentIdx];
@@ -298,6 +322,7 @@ const stateRef = useRef<MutableState>({
       const st = engine.getDisplayState();
 
       stopAudio(s.currentIndex);
+      attachAudioListeners(content.index);
       s.currentContentIdx = pos;
       s.currentIndex = content.index;
       s.currentContent = content;
@@ -373,10 +398,15 @@ const stateRef = useRef<MutableState>({
     }
 
     startGameFnRef.current = startGame;
+    toggleAudioRef.current = toggleAudio;
 
     cleanupFnRef.current = () => {
       stopAllAudio();
       stopStatsTimer();
+      if (audioListenerCleanupRef.current) {
+        audioListenerCleanupRef.current();
+        audioListenerCleanupRef.current = null;
+      }
     };
 
     // --- event handlers ---
@@ -521,6 +551,7 @@ const stateRef = useRef<MutableState>({
 
   const startGame = useCallback(() => startGameFnRef.current(), []);
   const cleanup = useCallback(() => cleanupFnRef.current(), []);
+  const toggleAudio = useCallback(() => toggleAudioRef.current(), []);
 
-  return { display, startGame, cleanup };
+  return { display, startGame, cleanup, toggleAudio };
 }

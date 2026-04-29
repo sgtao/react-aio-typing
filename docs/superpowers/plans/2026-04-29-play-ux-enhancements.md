@@ -387,7 +387,7 @@ git commit -m "feat: add left/right arrow key navigation with boundary flash"
 - Modify: `app/hooks/useGameState.ts`
 - Modify: `app/context/GameContext.tsx`
 
-- [ ] **Step 1: `attachAudioListeners` 関数を `useEffect` 内に追加する**
+- [x] **Step 1: `attachAudioListeners` 関数を `useEffect` 内に追加する**
 
 `loadContent` 関数の直前に追加:
 
@@ -417,7 +417,7 @@ function attachAudioListeners(indexName: string) {
 }
 ```
 
-- [ ] **Step 2: `loadContent` 内で `attachAudioListeners` を呼ぶ**
+- [x] **Step 2: `loadContent` 内で `attachAudioListeners` を呼ぶ**
 
 `loadContent` 内の `stopAudio(s.currentIndex);` の直後に追加:
 
@@ -427,7 +427,7 @@ attachAudioListeners(content.index);  // ← 追加
 s.currentContentIdx = pos;
 ```
 
-- [ ] **Step 3: `toggleAudioRef` を `toggleAudio` 関数に向ける**
+- [x] **Step 3: `toggleAudioRef` を `toggleAudio` 関数に向ける**
 
 `useEffect` 内の `startGameFnRef.current = startGame;` の直後に追加:
 
@@ -435,7 +435,7 @@ s.currentContentIdx = pos;
 toggleAudioRef.current = toggleAudio;
 ```
 
-- [ ] **Step 4: `cleanupFnRef` に音声リスナーのクリーンアップを追加する**
+- [x] **Step 4: `cleanupFnRef` に音声リスナーのクリーンアップを追加する**
 
 ```typescript
 cleanupFnRef.current = () => {
@@ -448,7 +448,7 @@ cleanupFnRef.current = () => {
 };
 ```
 
-- [ ] **Step 5: `useGameState` の返り値に `toggleAudio` を追加する**
+- [x] **Step 5: `useGameState` の返り値に `toggleAudio` を追加する**
 
 `useEffect` の外（ファイル末尾付近）の `return` を変更:
 
@@ -457,7 +457,7 @@ const toggleAudio = useCallback(() => toggleAudioRef.current(), []);
 return { display, startGame, cleanup, toggleAudio };
 ```
 
-- [ ] **Step 6: `GameContext.tsx` を更新する**
+- [x] **Step 6: `GameContext.tsx` を更新する**
 
 `app/context/GameContext.tsx` を以下に置き換える:
 
@@ -507,7 +507,7 @@ export function useGameContext(): GameContextValue {
 }
 ```
 
-- [ ] **Step 7: 型チェックを実行する**
+- [x] **Step 7: 型チェックを実行する**
 
 ```bash
 npm run typecheck
@@ -515,7 +515,7 @@ npm run typecheck
 
 期待出力: exit code 0
 
-- [ ] **Step 8: コミットする（ユーザーに確認すること）**
+- [x] **Step 8: コミットする（ユーザーに確認すること）**
 
 ```bash
 git add app/hooks/useGameState.ts app/context/GameContext.tsx
