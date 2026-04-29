@@ -29,7 +29,7 @@
 **Files:**
 - Modify: `app/hooks/useGameState.ts`
 
-- [ ] **Step 1: `GameDisplay` インターフェースに4フィールドを追加する**
+- [x] **Step 1: `GameDisplay` インターフェースに4フィールドを追加する**
 
 `app/hooks/useGameState.ts` の `GameDisplay` インターフェース末尾（`shiftHintActive` の後）に追加:
 
@@ -60,7 +60,7 @@ export interface GameDisplay {
 }
 ```
 
-- [ ] **Step 2: `MutableState` を `contentsIndex` → `playOrder` + `currentContentIdx` + `leftFlashTimer` に変更する**
+- [x] **Step 2: `MutableState` を `contentsIndex` → `playOrder` + `currentContentIdx` + `leftFlashTimer` に変更する**
 
 ```typescript
 interface MutableState {
@@ -79,7 +79,7 @@ interface MutableState {
 }
 ```
 
-- [ ] **Step 3: `useState` の初期値に4フィールドを追加する**
+- [x] **Step 3: `useState` の初期値に4フィールドを追加する**
 
 ```typescript
 const [display, setDisplay] = useState<GameDisplay>({
@@ -108,7 +108,7 @@ const [display, setDisplay] = useState<GameDisplay>({
 });
 ```
 
-- [ ] **Step 4: `stateRef` の初期値を更新する**
+- [x] **Step 4: `stateRef` の初期値を更新する**
 
 ```typescript
 const stateRef = useRef<MutableState>({
@@ -127,7 +127,7 @@ const stateRef = useRef<MutableState>({
 });
 ```
 
-- [ ] **Step 5: 新しい `useRef` を2つ追加する**
+- [x] **Step 5: 新しい `useRef` を2つ追加する**
 
 `startGameFnRef` の宣言の後に追加:
 
@@ -136,7 +136,7 @@ const audioListenerCleanupRef = useRef<(() => void) | null>(null);
 const toggleAudioRef = useRef<() => void>(() => {});
 ```
 
-- [ ] **Step 6: 型チェックを実行する**
+- [x] **Step 6: 型チェックを実行する**
 
 ```bash
 npm run typecheck
@@ -160,7 +160,7 @@ git commit -m "feat: extend GameDisplay and MutableState types for play UX enhan
 
 このタスクは `useEffect` 内の関数を書き換える。既存の `nextContent` を削除し `loadContent` + 新しい `nextContent` に置き換え、`startGame` を更新する。
 
-- [ ] **Step 1: `useEffect` 内に `loadContent(pos)` 関数を追加する**
+- [x] **Step 1: `useEffect` 内に `loadContent(pos)` 関数を追加する**
 
 `startStatsTimer` の定義の後、既存の `nextContent` の前に以下を追加する:
 
@@ -213,7 +213,7 @@ function loadContent(pos: number) {
 }
 ```
 
-- [ ] **Step 2: 既存の `nextContent` 関数を全面置き換えする**
+- [x] **Step 2: 既存の `nextContent` 関数を全面置き換えする**
 
 既存の `nextContent` 関数（`if (s.contentsIndex.length === 0)` から始まる）を削除し、以下に置き換える:
 
@@ -228,7 +228,7 @@ function nextContent() {
 }
 ```
 
-- [ ] **Step 3: `startGame` 関数を更新する**
+- [x] **Step 3: `startGame` 関数を更新する**
 
 `startGame` を以下に置き換える:
 
@@ -265,7 +265,7 @@ async function startGame() {
 }
 ```
 
-- [ ] **Step 4: 型チェックを実行する**
+- [x] **Step 4: 型チェックを実行する**
 
 ```bash
 npm run typecheck
@@ -273,7 +273,7 @@ npm run typecheck
 
 期待出力: exit code 0
 
-- [ ] **Step 5: 開発サーバーで動作確認する**
+- [x] **Step 5: 開発サーバーで動作確認する**
 
 ```bash
 npm run dev
@@ -285,7 +285,7 @@ npm run dev
 - random/sequential 両モードで正常に動作する
 - `sectionPosition` が 1 から始まることをコンソールで確認（DevTools → React DevTools）
 
-- [ ] **Step 6: コミットする（ユーザーに確認すること）**
+- [x] **Step 6: コミットする（ユーザーに確認すること）**
 
 ```bash
 git add app/hooks/useGameState.ts

@@ -28,6 +28,10 @@ export interface GameDisplay {
   escWarning: boolean;
   mode: 'typing' | 'composition';
   shiftHintActive: boolean;
+  sectionPosition: number;
+  sectionTotal: number;
+  isAudioPlaying: boolean;
+  leftFlash: boolean;
 }
 
 export type { TypedChar };
@@ -44,7 +48,8 @@ interface ContentItem {
 interface MutableState {
   phase: GamePhase;
   contents: ContentItem[];
-  contentsIndex: number[];
+  playOrder: number[];
+  currentContentIdx: number;
   currentIndex: string;
   currentContent: ContentItem | null;
   translationMode: 'slashed' | 'natural';
@@ -52,6 +57,7 @@ interface MutableState {
   timerHandle: ReturnType<typeof setInterval> | null;
   escWarning: boolean;
   escWarningTimer: ReturnType<typeof setTimeout> | null;
+  leftFlashTimer: ReturnType<typeof setTimeout> | null;
 }
 
 function sentenceToContent(s: Sentence): ContentItem {
@@ -89,20 +95,26 @@ export function useGameState(
     escWarning: false,
     mode: 'typing',
     shiftHintActive: false,
+    sectionPosition: 0,
+    sectionTotal: 0,
+    isAudioPlaying: false,
+    leftFlash: false,
   });
 
-  const stateRef = useRef<MutableState>({
-    phase: 'menu',
-    contents: [],
-    contentsIndex: [],
-    currentIndex: '',
-    currentContent: null,
-    translationMode: 'slashed',
-    engine: null,
-    timerHandle: null,
-    escWarning: false,
-    escWarningTimer: null,
-  });
+const stateRef = useRef<MutableState>({
+  phase: 'menu',
+  contents: [],
+  playOrder: [],
+  currentContentIdx: -1,
+  currentIndex: '',
+  currentContent: null,
+  translationMode: 'slashed',
+  engine: null,
+  timerHandle: null,
+  escWarning: false,
+  escWarningTimer: null,
+  leftFlashTimer: null,
+});
 
   const navigateRef = useRef(navigate);
   navigateRef.current = navigate;
@@ -112,6 +124,8 @@ export function useGameState(
   const csvPathRef = useRef(csvPath);
   const settingsRef = useRef(settings);
   const startGameFnRef = useRef<() => void>(() => {});
+  const audioListenerCleanupRef = useRef<(() => void) | null>(null);
+  const toggleAudioRef = useRef<() => void>(() => {});
 
   settingsRef.current = settings;
 
@@ -271,33 +285,28 @@ export function useGameState(
       }));
     }
 
-    function nextContent() {
-      if (s.contentsIndex.length === 0) {
-        gotoMenu();
-        return;
-      }
-
-      stopAudio(s.currentIndex);
-
+    function loadContent(pos: number) {
+      const contentIdx = s.playOrder[pos];
+      const content = s.contents[contentIdx];
       const cfg = settingsRef.current;
-      // sequential: always take first; random: take from random position
-      const splicePos = cfg.order === 'sequential' ? 0 : Math.floor(Math.random() * s.contentsIndex.length);
-      const idx = s.contentsIndex.splice(splicePos, 1)[0];
-      const content = s.contents[idx];
       const translationMode = cfg.translation;
       const hintText = computeHintText(content);
       const pendingMask =
         cfg.mode === 'composition' ? buildPendingMask(content.word, cfg.hintLevel) : null;
       const translateText = computeTranslateText(content, translationMode);
-
       const engine = new TypingEngine(content.word, cfg.mistypeMode, cfg.caseInsensitive);
       const st = engine.getDisplayState();
 
+      stopAudio(s.currentIndex);
+      s.currentContentIdx = pos;
       s.currentIndex = content.index;
       s.currentContent = content;
       s.translationMode = translationMode;
       s.engine = engine;
       s.phase = 'playing';
+
+      startStatsTimer();
+      playAudioAuto(content.index);
 
       setDisplay((prev) => ({
         ...prev,
@@ -315,11 +324,21 @@ export function useGameState(
         elapsed: 0,
         results: null,
         mode: cfg.mode,
+        sectionPosition: pos + 1,
+        sectionTotal: s.playOrder.length,
+        isAudioPlaying: false,
+        leftFlash: false,
         shiftHintActive: false,
       }));
+    }
 
-      startStatsTimer();
-      playAudioAuto(content.index);
+    function nextContent() {
+      const nextPos = s.currentContentIdx + 1;
+      if (nextPos >= s.playOrder.length) {
+        gotoMenu();
+        return;
+      }
+      loadContent(nextPos);
     }
 
     async function startGame() {
@@ -329,7 +348,15 @@ export function useGameState(
       const sentences = csvLoader.getByCategory(cfg.category);
       if (sentences.length === 0) return;
       s.contents = sentences.map(sentenceToContent);
-      s.contentsIndex = s.contents.map((_, i) => i);
+
+      s.playOrder = s.contents.map((_, i) => i);
+      if (cfg.order === 'random') {
+        for (let i = s.playOrder.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [s.playOrder[i], s.playOrder[j]] = [s.playOrder[j], s.playOrder[i]];
+        }
+      }
+      s.currentContentIdx = -1;
 
       audio.forEach((el) => el.pause());
       audio.clear();
@@ -341,8 +368,7 @@ export function useGameState(
       }
 
       setDisplay((prev) => ({ ...prev, category: cfg.category! }));
-      // nextContent sets phase='playing' before navigate so play.tsx mounts with correct state
-      nextContent();
+      loadContent(0);
       navigateRef.current('/play');
     }
 
