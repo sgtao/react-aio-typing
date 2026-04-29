@@ -34,7 +34,7 @@ function TypingDisplay({ display }: { display: GameDisplay }) {
 export function PlayingScreen({ display, toggleAudio }: Props) {
   const {
     hintText, targetText, translateText, translationMode,
-    escWarning, mode, shiftHintActive, wpm, accuracy, elapsed, isAudioPlaying,
+    escWarning, mode, shiftHintActive, wpm, accuracy, elapsed, isAudioPlaying, hasAudio,
   } = display;
 
   const displayedHint = shiftHintActive ? targetText : hintText;
@@ -64,10 +64,12 @@ export function PlayingScreen({ display, toggleAudio }: Props) {
 
       <LiveStats wpm={wpm} accuracy={accuracy} elapsed={elapsed} />
 
-      <button className="audio-btn" onClick={toggleAudio}>
-        <span className="audio-icon">{isAudioPlaying ? '⏸' : '▶'}</span>
-        {isAudioPlaying ? 'Stop ( Enter )' : 'Start ( Enter )'}
-      </button>
+      {hasAudio && (
+        <button className="audio-btn" onClick={toggleAudio}>
+          <span className="audio-icon">{isAudioPlaying ? '⏸' : '▶'}</span>
+          {isAudioPlaying ? 'Stop ( Enter )' : 'Start ( Enter )'}
+        </button>
+      )}
     </>
   );
 }

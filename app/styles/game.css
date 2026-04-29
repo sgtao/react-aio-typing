@@ -50,13 +50,18 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
-.section-header--flash {
-  animation: flash-red 0.5s ease;
+.boundary-flash {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(220, 50, 50, 0.2);
+  animation: flash-boundary 0.5s ease forwards;
+  pointer-events: none;
+  z-index: 999;
 }
 
-@keyframes flash-red {
-  0%, 100% { background-color: transparent; }
-  30%       { background-color: #fee2e2; }
+@keyframes flash-boundary {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .section-category {

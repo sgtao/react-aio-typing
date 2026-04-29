@@ -30,12 +30,12 @@ export default function Play() {
 
   return (
     <ProtectedRoute>
+      {display.leftFlash && <div className="boundary-flash" />}
       <SectionHeader
         category={display.category}
         currentIndex={display.currentIndex}
         sectionPosition={display.sectionPosition}
         sectionTotal={display.sectionTotal}
-        leftFlash={display.leftFlash}
       />
       {content}
     </ProtectedRoute>

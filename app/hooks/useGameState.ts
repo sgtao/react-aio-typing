@@ -31,6 +31,7 @@ export interface GameDisplay {
   sectionPosition: number;
   sectionTotal: number;
   isAudioPlaying: boolean;
+  hasAudio: boolean;
   leftFlash: boolean;
 }
 
@@ -98,6 +99,7 @@ export function useGameState(
     sectionPosition: 0,
     sectionTotal: 0,
     isAudioPlaying: false,
+    hasAudio: false,
     leftFlash: false,
   });
 
@@ -343,6 +345,7 @@ const stateRef = useRef<MutableState>({
       startStatsTimer();
       playAudioAuto(content.index);
 
+      const contentHasAudio = !!audio.get(content.index);
       setDisplay((prev) => ({
         ...prev,
         phase: 'playing',
@@ -362,6 +365,7 @@ const stateRef = useRef<MutableState>({
         sectionPosition: pos + 1,
         sectionTotal: s.playOrder.length,
         isAudioPlaying: false,
+        hasAudio: contentHasAudio,
         leftFlash: false,
         shiftHintActive: false,
       }));

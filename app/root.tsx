@@ -77,7 +77,7 @@ function NavBar() {
       </button>
       {showBackBtn && (
         <button onClick={() => navigate('/menu')} className="back-btn">
-          ← メニューへ戻る
+          ← メニューへ戻る(Esc)
         </button>
       )}
     </div>
