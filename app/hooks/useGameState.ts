@@ -61,6 +61,16 @@ interface MutableState {
   leftFlashTimer: ReturnType<typeof setTimeout> | null;
 }
 
+interface GameContextValue {
+  display: GameDisplay;
+  settings: Settings;
+  updateSettings: (partial: Partial<Settings>) => void;
+  startGame: () => void;
+  startGameWithCategory: (cat: string) => void;
+  cleanup: () => void;
+  toggleAudio: () => void;
+}
+
 function sentenceToContent(s: Sentence): ContentItem {
   return {
     no: s.no,
@@ -126,6 +136,7 @@ const stateRef = useRef<MutableState>({
   const csvPathRef = useRef(csvPath);
   const settingsRef = useRef(settings);
   const startGameFnRef = useRef<() => void>(() => {});
+  const startGameWithCategoryRef = useRef<(cat: string) => void>(() => {});
   const audioListenerCleanupRef = useRef<(() => void) | null>(null);
   const toggleAudioRef = useRef<() => void>(() => {});
 
@@ -412,6 +423,12 @@ const stateRef = useRef<MutableState>({
     }
 
     startGameFnRef.current = startGame;
+    function startGameWithCategory(cat: string) {
+      settingsRef.current = { ...settingsRef.current, category: cat };
+      startGameFnRef.current();
+    }
+    startGameWithCategoryRef.current = startGameWithCategory;
+
     toggleAudioRef.current = toggleAudio;
 
     cleanupFnRef.current = () => {
@@ -577,6 +594,7 @@ const stateRef = useRef<MutableState>({
   const startGame = useCallback(() => startGameFnRef.current(), []);
   const cleanup = useCallback(() => cleanupFnRef.current(), []);
   const toggleAudio = useCallback(() => toggleAudioRef.current(), []);
+  const startGameWithCategory = useCallback((cat: string) => startGameWithCategoryRef.current(cat), []);
 
-  return { display, startGame, cleanup, toggleAudio };
+  return { display, startGame, startGameWithCategory, cleanup, toggleAudio };
 }

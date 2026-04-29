@@ -21,7 +21,7 @@ const GameContext = createContext<GameContextValue | null>(null);
 export function GameProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { settings, updateSettings } = useSettings();
-  const { display, startGame, cleanup, toggleAudio } = useGameState(CSV_PATH, settings, navigate);
+  const { display, startGame, startGameWithCategory, cleanup, toggleAudio } = useGameState(CSV_PATH, settings, navigate);
 
   useEffect(() => {
     if (display.categories.length > 0 && settings.category === null) {
@@ -29,8 +29,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [display.categories, settings.category, updateSettings]);
 
+  function handleStartGameWithCategory(cat: string) {
+    updateSettings({ category: cat });
+    startGameWithCategory(cat);
+  }
+
   return (
-    <GameContext.Provider value={{ display, settings, updateSettings, startGame, cleanup, toggleAudio }}>
+    <GameContext.Provider value={{ display, settings, updateSettings, startGame, startGameWithCategory: handleStartGameWithCategory, cleanup, toggleAudio }}>
       {children}
     </GameContext.Provider>
   );
