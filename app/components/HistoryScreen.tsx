@@ -72,7 +72,7 @@ function CategoryTab({ onCategoryResetRequest }: {
           </div>
         </div>
         <div className="summary-stat-card">
-          <div className="summary-stat-label">平均スコア</div>
+          <div className="summary-stat-label">平均 WPM / 正確率</div>
           <div className="summary-stat-value">
             {avgWpm !== null ? `${avgWpm} WPM` : '—'}
           </div>
