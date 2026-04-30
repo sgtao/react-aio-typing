@@ -17,7 +17,7 @@ interface VoiceProps {
   onSetAccumulatedText: Dispatch<SetStateAction<string>>;
   onJudgePartial: () => void;
   onReset: () => void;
-  onNext: () => void;
+  onRegister: (accuracy: number, mistypeCount: number) => void;
   isSpeechSupported: boolean;
 }
 
@@ -62,7 +62,7 @@ function VoiceModal({ voice, displayProps }: { voice: VoiceProps; displayProps: 
   const {
     isRecording, transcript, accumulatedText, recordingProgress, partialMatchResult,
     onStartRecording, onStopRecording, onAppendTranscript, onSetAccumulatedText,
-    onJudgePartial, onReset, onNext, onToggleVoiceMode,
+    onJudgePartial, onReset, onRegister, onToggleVoiceMode,
   } = voice;
   const { translateText, translationMode, displayedHint } = displayProps;
 
@@ -148,7 +148,18 @@ function VoiceModal({ voice, displayProps }: { voice: VoiceProps; displayProps: 
             </div>
             <div className="voice-actions">
               <button className="voice-retry-btn" onClick={onReset}>もう一度</button>
-              <button className="voice-next-btn" onClick={onNext}>次へ →</button>
+              <button
+                className="voice-next-btn"
+                onClick={() => {
+                  const matched = partialMatchResult!.filter((w) => w.matched).length;
+                  const total = partialMatchResult!.length;
+                  const accuracy = total > 0 ? Math.round((matched / total) * 100) : 100;
+                  const mistypeCount = total - matched;
+                  onRegister(accuracy, mistypeCount);
+                }}
+              >
+                登録
+              </button>
             </div>
           </div>
         )}

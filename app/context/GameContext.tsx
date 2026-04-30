@@ -17,6 +17,7 @@ interface GameContextValue {
   toggleAudio: () => void;
   goToNextContent: () => void;
   setVoiceMode: (active: boolean) => void;
+  saveVoiceResult: (accuracy: number, mistypeCount: number) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -24,7 +25,7 @@ const GameContext = createContext<GameContextValue | null>(null);
 export function GameProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { settings, updateSettings } = useSettings();
-  const { display, startGame, startGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode } = useGameState(CSV_PATH, settings, navigate);
+  const { display, startGame, startGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode, saveVoiceResult } = useGameState(CSV_PATH, settings, navigate);
 
   useEffect(() => {
     if (display.categories.length > 0 && settings.category === null) {
@@ -38,7 +39,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <GameContext.Provider value={{ display, settings, updateSettings, startGame, startGameWithCategory: handleStartGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode }}>
+    <GameContext.Provider value={{ display, settings, updateSettings, startGame, startGameWithCategory: handleStartGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode, saveVoiceResult }}>
       {children}
     </GameContext.Provider>
   );

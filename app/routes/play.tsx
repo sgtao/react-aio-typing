@@ -8,7 +8,7 @@ import { SectionHeader } from '../components/SectionHeader';
 import { useSpeechInput } from '../hooks/useSpeechInput';
 
 export default function Play() {
-  const { display, cleanup, toggleAudio, goToNextContent, setVoiceMode } = useGameContext();
+  const { display, cleanup, toggleAudio, goToNextContent, setVoiceMode, saveVoiceResult } = useGameContext();
   const navigate = useNavigate();
 
   const {
@@ -58,7 +58,11 @@ export default function Play() {
     onSetAccumulatedText: setAccumulatedText,
     onJudgePartial: () => judgePartial(display.targetText),
     onReset: reset,
-    onNext: () => { goToNextContent(); toggleVoiceMode(); },
+    onRegister: (accuracy: number, mistypeCount: number) => {
+      saveVoiceResult(accuracy, mistypeCount);
+      goToNextContent();
+      toggleVoiceMode();
+    },
     isSpeechSupported,
   };
 

@@ -132,6 +132,7 @@ const stateRef = useRef<MutableState>({
   const toggleAudioRef = useRef<() => void>(() => {});
   const voiceModeRef = useRef(false);
   const nextContentFnRef = useRef<() => void>(() => {});
+  const saveVoiceResultFnRef = useRef<(accuracy: number, mistypeCount: number) => void>(() => {});
 
   settingsRef.current = settings;
 
@@ -417,6 +418,24 @@ const stateRef = useRef<MutableState>({
 
     startGameFnRef.current = startGame;
     nextContentFnRef.current = nextContent;
+    saveVoiceResultFnRef.current = saveVoiceResult;
+
+    function saveVoiceResult(accuracy: number, mistypeCount: number) {
+      if (!s.currentContent) return;
+      historyStorage.saveSession({
+        no:        s.currentContent.no,
+        category:  s.currentContent.category,
+        index:     s.currentContent.index,
+        mode:      settingsRef.current.mode,
+        wpm:       0,
+        accuracy,
+        elapsed:   0,
+        timestamp: Date.now(),
+      });
+      if (mistypeCount > 0) {
+        historyStorage.recordMistypes(s.currentContent.no, mistypeCount);
+      }
+    }
 
     function startGameWithCategory(cat: string) {
       settingsRef.current = { ...settingsRef.current, category: cat };
@@ -593,6 +612,7 @@ const stateRef = useRef<MutableState>({
   const startGameWithCategory = useCallback((cat: string) => startGameWithCategoryRef.current(cat), []);
   const goToNextContent = useCallback(() => nextContentFnRef.current(), []);
   const setVoiceMode = useCallback((active: boolean) => { voiceModeRef.current = active; }, []);
+  const saveVoiceResult = useCallback((accuracy: number, mistypeCount: number) => saveVoiceResultFnRef.current(accuracy, mistypeCount), []);
 
-  return { display, startGame, startGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode };
+  return { display, startGame, startGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode, saveVoiceResult };
 }
