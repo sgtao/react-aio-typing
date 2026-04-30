@@ -16,6 +16,26 @@ export function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+export interface WordMatch {
+  word: string;
+  matched: boolean;
+}
+
+export function computeWordMatches(accumulatedText: string, targetText: string): WordMatch[] {
+  const targetWords = targetText.split(/\s+/).filter(Boolean);
+  const accumulatedNormSet = new Set(
+    accumulatedText
+      .toLowerCase()
+      .split(/\s+/)
+      .map((w) => w.replace(/[^a-z0-9]/g, ''))
+      .filter(Boolean)
+  );
+  return targetWords.map((word) => ({
+    word,
+    matched: accumulatedNormSet.has(word.toLowerCase().replace(/[^a-z0-9]/g, '')),
+  }));
+}
+
 export interface UseSpeechInputReturn {
   isVoiceMode: boolean;
   isRecording: boolean;
