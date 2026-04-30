@@ -84,7 +84,9 @@ function VoiceModal({ voice }: { voice: VoiceProps }) {
 
           {isRecording && (
             <div className="voice-progress-wrap">
-              <div className="voice-progress-bar" style={{ width: `${recordingProgress}%` }} />
+              <div className="voice-progress-track">
+                <div className="voice-progress-bar" style={{ width: `${recordingProgress}%` }} />
+              </div>
               <span className="voice-progress-time">{remainingSeconds}s</span>
             </div>
           )}

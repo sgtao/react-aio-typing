@@ -959,20 +959,27 @@ h1 {
   gap: 0.5rem;
 }
 
-.voice-progress-bar {
+.voice-progress-track {
   flex: 1;
   height: 8px;
+  background: #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.voice-progress-bar {
+  height: 100%;
   background: #4a90d9;
   border-radius: 4px;
   transition: width 0.1s linear;
-  min-width: 0;
 }
 
 .voice-progress-time {
   font-size: 0.8rem;
   color: #666;
   white-space: nowrap;
-  min-width: 3ch;
+  min-width: 5ch;
   text-align: right;
 }
 
