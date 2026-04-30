@@ -837,15 +837,6 @@ h1 {
   color: #1a5fa8;
 }
 
-.voice-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  width: 100%;
-  max-width: 480px;
-}
-
 .voice-record-btn {
   padding: 0.6rem 1.5rem;
   border: 2px solid #d9534f;
@@ -863,14 +854,6 @@ h1 {
   color: #fff;
 }
 
-.voice-transcript {
-  font-size: 0.95rem;
-  color: #444;
-  font-style: italic;
-  text-align: center;
-  margin: 0;
-}
-
 .voice-judge-btn {
   padding: 0.5rem 1.2rem;
   border: none;
@@ -885,20 +868,6 @@ h1 {
 .voice-judge-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.voice-result {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin: 0;
-}
-
-.voice-result--match {
-  color: #27ae60;
-}
-
-.voice-result--mismatch {
-  color: #e74c3c;
 }
 
 .voice-actions {
@@ -923,4 +892,147 @@ h1 {
   color: #fff;
   cursor: pointer;
   font-size: 0.9rem;
+}
+
+/* --- Voice Modal --- */
+.voice-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.voice-modal-dialog {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: min(90vw, 480px);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.voice-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.voice-modal-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.voice-modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.voice-modal-close-btn:hover {
+  background: #f0f0f0;
+}
+
+.voice-modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-top: 1px solid #eee;
+  padding: 0.75rem 0;
+}
+
+/* Progress bar */
+.voice-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.voice-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #4a90d9;
+  border-radius: 4px;
+  transition: width 0.1s linear;
+  min-width: 0;
+}
+
+.voice-progress-time {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+  min-width: 3ch;
+  text-align: right;
+}
+
+/* Current transcript row */
+.voice-current-transcript {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-style: italic;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.voice-append-btn {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid #4a90d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #4a90d9;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Accumulated textarea */
+.voice-accumulated-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: bold;
+}
+
+.voice-accumulated-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Word-level result */
+.voice-word-result {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  line-height: 1.6;
+}
+
+.voice-word {
+  font-size: 1rem;
+}
+
+.voice-word--matched {
+  color: #27ae60;
+}
+
+.voice-word--unmatched {
+  color: #e74c3c;
 }
