@@ -94,6 +94,7 @@ export function useSpeechInput(): UseSpeechInputReturn {
     recognitionRef.current = recognition;
 
     return () => {
+      clearTimer();
       recognition.abort();
     };
   }, []);
@@ -144,6 +145,9 @@ export function useSpeechInput(): UseSpeechInputReturn {
   }
 
   function reset() {
+    clearTimer();
+    recognitionRef.current?.stop();
+    setIsRecording(false);
     setTranscript('');
     setAccumulatedText('');
     setPartialMatchResult(null);
