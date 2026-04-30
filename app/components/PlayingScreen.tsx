@@ -98,8 +98,9 @@ function VoiceModal({ voice }: { voice: VoiceProps }) {
         </div>
 
         <div className="voice-modal-section">
-          <label className="voice-accumulated-label">判定用テキスト</label>
+          <label className="voice-accumulated-label" htmlFor="voice-accumulated">判定用テキスト</label>
           <textarea
+            id="voice-accumulated"
             className="voice-accumulated-textarea"
             value={accumulatedText}
             onChange={(e) => onSetAccumulatedText(e.target.value)}
