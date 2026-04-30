@@ -52,12 +52,19 @@ function TypingDisplay({ display }: { display: GameDisplay }) {
   );
 }
 
-function VoiceModal({ voice }: { voice: VoiceProps }) {
+interface VoiceModalDisplayProps {
+  translateText: string;
+  translationMode: 'slashed' | 'natural';
+  displayedHint: string;
+}
+
+function VoiceModal({ voice, displayProps }: { voice: VoiceProps; displayProps: VoiceModalDisplayProps }) {
   const {
     isRecording, transcript, accumulatedText, recordingProgress, partialMatchResult,
     onStartRecording, onStopRecording, onAppendTranscript, onSetAccumulatedText,
     onJudgePartial, onReset, onNext, onToggleVoiceMode,
   } = voice;
+  const { translateText, translationMode, displayedHint } = displayProps;
 
   const remainingSeconds = ((recordingProgress / 100) * 15).toFixed(1);
 
@@ -72,6 +79,16 @@ function VoiceModal({ voice }: { voice: VoiceProps }) {
         <div className="voice-modal-header">
           <span className="voice-modal-title">🎤 音声入力</span>
           <button className="voice-modal-close-btn" onClick={handleClose}>✕</button>
+        </div>
+
+        <div className="voice-modal-section voice-modal-context">
+          <p className="hint-text voice-modal-hint">
+            <span className="translate-label">
+              {translationMode === 'slashed' ? 'スラッシュ訳' : '自然な訳'}：
+            </span>
+            {translateText}
+          </p>
+          {displayedHint && <p className="translate-text">{displayedHint}</p>}
         </div>
 
         <div className="voice-modal-section">
@@ -140,7 +157,7 @@ function VoiceModal({ voice }: { voice: VoiceProps }) {
   );
 }
 
-function VoicePanel({ voice }: { voice: VoiceProps }) {
+function VoicePanel({ voice, displayProps }: { voice: VoiceProps; displayProps: VoiceModalDisplayProps }) {
   const { isVoiceMode, isSpeechSupported, onToggleVoiceMode } = voice;
 
   return (
@@ -153,7 +170,7 @@ function VoicePanel({ voice }: { voice: VoiceProps }) {
           🎤 音声入力
         </button>
       )}
-      {isVoiceMode && <VoiceModal voice={voice} />}
+      {isVoiceMode && <VoiceModal voice={voice} displayProps={displayProps} />}
     </div>
   );
 }
@@ -198,7 +215,12 @@ export function PlayingScreen({ display, toggleAudio, voice }: Props) {
         </button>
       )}
 
-      {mode === 'composition' && <VoicePanel voice={voice} />}
+      {mode === 'composition' && (
+        <VoicePanel
+          voice={voice}
+          displayProps={{ translateText, translationMode, displayedHint }}
+        />
+      )}
     </>
   );
 }

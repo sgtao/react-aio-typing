@@ -909,7 +909,7 @@ h1 {
   background: #fff;
   border-radius: 12px;
   padding: 1.5rem;
-  width: min(90vw, 480px);
+  width: min(72vw, 800px);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -1042,4 +1042,16 @@ h1 {
 
 .voice-word--unmatched {
   color: #e74c3c;
+}
+
+/* Context (hint + hint-text) section inside modal — no top border for the first section */
+.voice-modal-context {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* hint-text inside modal: same background/color as PlayingScreen but smaller font */
+.voice-modal-hint {
+  font-size: 14px;
+  margin: 0 0 0.3em;
 }
