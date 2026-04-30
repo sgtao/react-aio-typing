@@ -1,15 +1,21 @@
+import type { Dispatch, SetStateAction } from 'react';
 import { LiveStats } from './LiveStats';
 import type { GameDisplay } from '../hooks/useGameState';
+import type { WordMatch } from '../hooks/useSpeechInput';
 
 interface VoiceProps {
   isVoiceMode: boolean;
   isRecording: boolean;
   transcript: string;
-  matchResult: 'match' | 'mismatch' | null;
+  accumulatedText: string;
+  recordingProgress: number;
+  partialMatchResult: WordMatch[] | null;
   onToggleVoiceMode: () => void;
   onStartRecording: () => void;
   onStopRecording: () => void;
-  onJudge: () => void;
+  onAppendTranscript: () => void;
+  onSetAccumulatedText: Dispatch<SetStateAction<string>>;
+  onJudgePartial: () => void;
   onReset: () => void;
   onNext: () => void;
   isSpeechSupported: boolean;
@@ -46,12 +52,93 @@ function TypingDisplay({ display }: { display: GameDisplay }) {
   );
 }
 
-function VoicePanel({ voice, targetText }: { voice: VoiceProps; targetText: string }) {
+function VoiceModal({ voice }: { voice: VoiceProps }) {
   const {
-    isVoiceMode, isRecording, transcript, matchResult,
-    onToggleVoiceMode, onStartRecording, onStopRecording, onJudge, onReset, onNext,
-    isSpeechSupported,
+    isRecording, transcript, accumulatedText, recordingProgress, partialMatchResult,
+    onStartRecording, onStopRecording, onAppendTranscript, onSetAccumulatedText,
+    onJudgePartial, onReset, onNext, onToggleVoiceMode,
   } = voice;
+
+  const remainingSeconds = ((recordingProgress / 100) * 15).toFixed(1);
+
+  function handleClose() {
+    if (isRecording) onStopRecording();
+    onToggleVoiceMode();
+  }
+
+  return (
+    <div className="voice-modal-overlay" onClick={handleClose}>
+      <div className="voice-modal-dialog" onClick={(e) => e.stopPropagation()}>
+        <div className="voice-modal-header">
+          <span className="voice-modal-title">🎤 音声入力</span>
+          <button className="voice-modal-close-btn" onClick={handleClose}>✕</button>
+        </div>
+
+        <div className="voice-modal-section">
+          <button
+            className={`voice-record-btn${isRecording ? ' voice-record-btn--recording' : ''}`}
+            onClick={isRecording ? onStopRecording : onStartRecording}
+          >
+            {isRecording ? '■ 停止' : '● 録音する'}
+          </button>
+
+          {isRecording && (
+            <div className="voice-progress-wrap">
+              <div className="voice-progress-bar" style={{ width: `${recordingProgress}%` }} />
+              <span className="voice-progress-time">{remainingSeconds}s</span>
+            </div>
+          )}
+
+          {transcript && (
+            <div className="voice-current-transcript">
+              <span>今回：「{transcript}」</span>
+              <button className="voice-append-btn" onClick={onAppendTranscript}>+ 反映</button>
+            </div>
+          )}
+        </div>
+
+        <div className="voice-modal-section">
+          <label className="voice-accumulated-label">判定用テキスト</label>
+          <textarea
+            className="voice-accumulated-textarea"
+            value={accumulatedText}
+            onChange={(e) => onSetAccumulatedText(e.target.value)}
+            rows={3}
+          />
+          <button
+            className="voice-judge-btn"
+            onClick={onJudgePartial}
+            disabled={!accumulatedText.trim()}
+          >
+            判定する
+          </button>
+        </div>
+
+        {partialMatchResult !== null && (
+          <div className="voice-modal-section">
+            <div className="voice-word-result">
+              {partialMatchResult.map((wm, i) => (
+                <span
+                  key={i}
+                  className={`voice-word${wm.matched ? ' voice-word--matched' : ' voice-word--unmatched'}`}
+                >
+                  {wm.word}
+                </span>
+              ))}
+            </div>
+            <div className="voice-actions">
+              <button className="voice-retry-btn" onClick={onReset}>もう一度</button>
+              <button className="voice-next-btn" onClick={onNext}>次へ →</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function VoicePanel({ voice }: { voice: VoiceProps }) {
+  const { isVoiceMode, isSpeechSupported, onToggleVoiceMode } = voice;
 
   return (
     <div className="voice-section">
@@ -63,43 +150,7 @@ function VoicePanel({ voice, targetText }: { voice: VoiceProps; targetText: stri
           🎤 音声入力
         </button>
       )}
-
-      {isVoiceMode && (
-        <div className="voice-panel">
-          <button
-            className={`voice-record-btn${isRecording ? ' voice-record-btn--recording' : ''}`}
-            onMouseDown={onStartRecording}
-            onMouseUp={onStopRecording}
-            onMouseLeave={onStopRecording}
-          >
-            {isRecording ? '● 録音中...' : '● 録音する'}
-          </button>
-
-          {transcript && (
-            <p className="voice-transcript">トランスクリプト：「{transcript}」</p>
-          )}
-
-          <button
-            className="voice-judge-btn"
-            onClick={onJudge}
-            disabled={!transcript}
-          >
-            判定する
-          </button>
-
-          {matchResult !== null && (
-            <>
-              <p className={`voice-result voice-result--${matchResult}`}>
-                {matchResult === 'match' ? '✅ 正解！' : '❌ 不一致'}
-              </p>
-              <div className="voice-actions">
-                <button className="voice-retry-btn" onClick={onReset}>もう一度</button>
-                <button className="voice-next-btn" onClick={onNext}>次へ →</button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+      {isVoiceMode && <VoiceModal voice={voice} />}
     </div>
   );
 }
@@ -144,9 +195,7 @@ export function PlayingScreen({ display, toggleAudio, voice }: Props) {
         </button>
       )}
 
-      {mode === 'composition' && (
-        <VoicePanel voice={voice} targetText={targetText} />
-      )}
+      {mode === 'composition' && <VoicePanel voice={voice} />}
     </>
   );
 }
