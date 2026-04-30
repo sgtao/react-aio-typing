@@ -244,9 +244,9 @@ export function HistoryScreen() {
             {
               tab: 'weak' as Tab,
               modifier: 'stats',
-              label: '平均 WPM / 正確率',
-              value: avgWpm !== null ? `${avgWpm} WPM` : '—',
-              sub: avgAccuracy !== null ? `${avgAccuracy}%` : '—',
+              label: '正確率 / 平均 WPM',
+              value: avgAccuracy !== null ? `${avgAccuracy}%` : '—',
+              sub: avgWpm !== null ? `${avgWpm} WPM` : '—',
             },
           ] as const
         ).map(({ tab, modifier, label, value, sub }) => (
