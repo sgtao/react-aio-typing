@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 
-// SpeechRecognition is not in TypeScript's DOM lib, so we define a minimal interface
 interface SpeechRecognitionLike {
   lang: string;
   continuous: boolean;
@@ -36,15 +35,22 @@ export function computeWordMatches(accumulatedText: string, targetText: string):
   }));
 }
 
+const MAX_RECORDING_MS = 15_000;
+const TIMER_INTERVAL_MS = 100;
+
 export interface UseSpeechInputReturn {
   isVoiceMode: boolean;
   isRecording: boolean;
   transcript: string;
-  matchResult: 'match' | 'mismatch' | null;
+  accumulatedText: string;
+  recordingProgress: number;
+  partialMatchResult: WordMatch[] | null;
   toggleVoiceMode: () => void;
   startRecording: () => void;
   stopRecording: () => void;
-  judge: (targetText: string) => void;
+  appendTranscript: () => void;
+  setAccumulatedText: React.Dispatch<React.SetStateAction<string>>;
+  judgePartial: (targetText: string) => void;
   reset: () => void;
   isSpeechSupported: boolean;
 }
@@ -53,8 +59,12 @@ export function useSpeechInput(): UseSpeechInputReturn {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [matchResult, setMatchResult] = useState<'match' | 'mismatch' | null>(null);
+  const [accumulatedText, setAccumulatedText] = useState('');
+  const [recordingProgress, setRecordingProgress] = useState(0);
+  const [partialMatchResult, setPartialMatchResult] = useState<WordMatch[] | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const progressRef = useRef(0);
 
   const isSpeechSupported =
     typeof window !== 'undefined' &&
@@ -75,7 +85,12 @@ export function useSpeechInput(): UseSpeechInputReturn {
         .join('');
       setTranscript(text);
     };
-    recognition.onend = () => setIsRecording(false);
+    recognition.onend = () => {
+      setIsRecording(false);
+      clearTimer();
+      setRecordingProgress(0);
+      progressRef.current = 0;
+    };
     recognitionRef.current = recognition;
 
     return () => {
@@ -83,9 +98,57 @@ export function useSpeechInput(): UseSpeechInputReturn {
     };
   }, []);
 
+  function clearTimer() {
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  function startRecording() {
+    if (!recognitionRef.current) return;
+    setTranscript('');
+    setPartialMatchResult(null);
+    setIsRecording(true);
+    progressRef.current = 100;
+    setRecordingProgress(100);
+    timerRef.current = setInterval(() => {
+      progressRef.current -= (TIMER_INTERVAL_MS / MAX_RECORDING_MS) * 100;
+      if (progressRef.current <= 0) {
+        progressRef.current = 0;
+        setRecordingProgress(0);
+        clearTimer();
+        recognitionRef.current?.stop();
+      } else {
+        setRecordingProgress(progressRef.current);
+      }
+    }, TIMER_INTERVAL_MS);
+    recognitionRef.current.start();
+  }
+
+  function stopRecording() {
+    clearTimer();
+    setRecordingProgress(0);
+    progressRef.current = 0;
+    recognitionRef.current?.stop();
+  }
+
+  function appendTranscript() {
+    if (!transcript) return;
+    setAccumulatedText((prev) => (prev ? prev + ' ' + transcript : transcript));
+    setTranscript('');
+  }
+
+  function judgePartial(targetText: string) {
+    setPartialMatchResult(computeWordMatches(accumulatedText, targetText));
+  }
+
   function reset() {
     setTranscript('');
-    setMatchResult(null);
+    setAccumulatedText('');
+    setPartialMatchResult(null);
+    setRecordingProgress(0);
+    progressRef.current = 0;
   }
 
   function toggleVoiceMode() {
@@ -93,32 +156,19 @@ export function useSpeechInput(): UseSpeechInputReturn {
     setIsVoiceMode((prev) => !prev);
   }
 
-  function startRecording() {
-    if (!recognitionRef.current) return;
-    setTranscript('');
-    setMatchResult(null);
-    setIsRecording(true);
-    recognitionRef.current.start();
-  }
-
-  function stopRecording() {
-    recognitionRef.current?.stop();
-  }
-
-  function judge(targetText: string) {
-    const isMatch = normalize(transcript) === normalize(targetText);
-    setMatchResult(isMatch ? 'match' : 'mismatch');
-  }
-
   return {
     isVoiceMode,
     isRecording,
     transcript,
-    matchResult,
+    accumulatedText,
+    recordingProgress,
+    partialMatchResult,
     toggleVoiceMode,
     startRecording,
     stopRecording,
-    judge,
+    appendTranscript,
+    setAccumulatedText,
+    judgePartial,
     reset,
     isSpeechSupported,
   };
