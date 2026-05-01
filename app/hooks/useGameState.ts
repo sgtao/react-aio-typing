@@ -133,6 +133,11 @@ const stateRef = useRef<MutableState>({
   const voiceModeRef = useRef(false);
   const nextContentFnRef = useRef<() => void>(() => {});
   const saveVoiceResultFnRef = useRef<(accuracy: number, mistypeCount: number) => void>(() => {});
+  const goToPrevContentFnRef = useRef<() => void>(() => {});
+  const goToNextNavFnRef = useRef<() => void>(() => {});
+  const handleEscapeFnRef = useRef<() => void>(() => {});
+  const toggleTranslationFnRef = useRef<() => void>(() => {});
+  const toggleShiftHintFnRef = useRef<() => void>(() => {});
 
   settingsRef.current = settings;
 
@@ -385,6 +390,61 @@ const stateRef = useRef<MutableState>({
       loadContent(nextPos);
     }
 
+    function goToPrev() {
+      clearEscWarning();
+      const st = s.engine ? s.engine.getDisplayState() : null;
+      const typedManual = st ? st.typed.filter((c) => !c.auto).length : 0;
+      if (typedManual > 0) {
+        resetCurrentContent();
+      } else if (s.currentContentIdx > 0) {
+        loadContent(s.currentContentIdx - 1);
+      } else {
+        triggerFlash();
+      }
+    }
+
+    function goToNextNav() {
+      clearEscWarning();
+      if (s.currentContentIdx < s.playOrder.length - 1) {
+        loadContent(s.currentContentIdx + 1);
+      } else {
+        triggerFlash();
+      }
+    }
+
+    function handleEscapeImpl() {
+      const st = s.engine ? s.engine.getDisplayState() : null;
+      const typedLen = st ? st.typed.filter((c) => !c.auto).length : 0;
+      if (typedLen === 0) {
+        gotoMenu();
+      } else if (s.escWarning) {
+        gotoMenu();
+      } else {
+        s.escWarning = true;
+        resetCurrentContent();
+        setDisplay((prev) => ({ ...prev, escWarning: true }));
+        s.escWarningTimer = setTimeout(() => {
+          s.escWarning = false;
+          s.escWarningTimer = null;
+          setDisplay((prev) => ({ ...prev, escWarning: false }));
+        }, 3000);
+      }
+    }
+
+    function toggleTranslation() {
+      const newMode = s.translationMode === 'slashed' ? 'natural' : 'slashed';
+      s.translationMode = newMode;
+      if (s.currentContent) {
+        const translateText = computeTranslateText(s.currentContent, newMode);
+        setDisplay((prev) => ({ ...prev, translationMode: newMode, translateText }));
+      }
+    }
+
+    function toggleShiftHint() {
+      if (settingsRef.current.mode !== 'composition') return;
+      setDisplay((prev) => ({ ...prev, shiftHintActive: !prev.shiftHintActive }));
+    }
+
     async function startGame() {
       const cfg = settingsRef.current;
       if (!cfg.category) return;
@@ -419,6 +479,11 @@ const stateRef = useRef<MutableState>({
     startGameFnRef.current = startGame;
     nextContentFnRef.current = nextContent;
     saveVoiceResultFnRef.current = saveVoiceResult;
+    goToPrevContentFnRef.current   = goToPrev;
+    goToNextNavFnRef.current       = goToNextNav;
+    handleEscapeFnRef.current      = handleEscapeImpl;
+    toggleTranslationFnRef.current = toggleTranslation;
+    toggleShiftHintFnRef.current   = toggleShiftHint;
 
     function saveVoiceResult(accuracy: number, mistypeCount: number) {
       if (!s.currentContent) return;
@@ -480,12 +545,7 @@ const stateRef = useRef<MutableState>({
         else if (e.key === 'Escape') gotoMenu();
         else if (e.key === 'Tab') {
           e.preventDefault();
-          const newMode = s.translationMode === 'slashed' ? 'natural' : 'slashed';
-          s.translationMode = newMode;
-          if (s.currentContent) {
-            const translateText = computeTranslateText(s.currentContent, newMode);
-            setDisplay((prev) => ({ ...prev, translationMode: newMode, translateText }));
-          }
+          toggleTranslation();
         }
         return;
       }
@@ -493,57 +553,23 @@ const stateRef = useRef<MutableState>({
       // playing
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        clearEscWarning();
-        const st = s.engine ? s.engine.getDisplayState() : null;
-        const typedManual = st ? st.typed.filter((c) => !c.auto).length : 0;
-        if (typedManual > 0) {
-          resetCurrentContent();
-        } else if (s.currentContentIdx > 0) {
-          loadContent(s.currentContentIdx - 1);
-        } else {
-          triggerFlash();
-        }
+        goToPrev();
         return;
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
-        clearEscWarning();
-        if (s.currentContentIdx < s.playOrder.length - 1) {
-          loadContent(s.currentContentIdx + 1);
-        } else {
-          triggerFlash();
-        }
+        goToNextNav();
         return;
       }
       if (e.key === 'Escape') {
         e.preventDefault();
-        const st = s.engine ? s.engine.getDisplayState() : null;
-        const typedLen = st ? st.typed.filter((c) => !c.auto).length : 0;
-        if (typedLen === 0) {
-          gotoMenu();
-        } else if (s.escWarning) {
-          gotoMenu();
-        } else {
-          s.escWarning = true;
-          resetCurrentContent();
-          setDisplay((prev) => ({ ...prev, escWarning: true }));
-          s.escWarningTimer = setTimeout(() => {
-            s.escWarning = false;
-            s.escWarningTimer = null;
-            setDisplay((prev) => ({ ...prev, escWarning: false }));
-          }, 3000);
-        }
+        handleEscapeImpl();
         return;
       }
       if (e.key === 'Enter') { e.preventDefault(); toggleAudio(); return; }
       if (e.key === 'Tab') {
         e.preventDefault();
-        const newMode = s.translationMode === 'slashed' ? 'natural' : 'slashed';
-        s.translationMode = newMode;
-        if (s.currentContent) {
-          const translateText = computeTranslateText(s.currentContent, newMode);
-          setDisplay((prev) => ({ ...prev, translationMode: newMode, translateText }));
-        }
+        toggleTranslation();
         return;
       }
       if (e.key === 'Shift' && !e.repeat && settingsRef.current.mode === 'composition') {
@@ -611,8 +637,27 @@ const stateRef = useRef<MutableState>({
   const toggleAudio = useCallback(() => toggleAudioRef.current(), []);
   const startGameWithCategory = useCallback((cat: string) => startGameWithCategoryRef.current(cat), []);
   const goToNextContent = useCallback(() => nextContentFnRef.current(), []);
+  const goToPrevContent   = useCallback(() => goToPrevContentFnRef.current(), []);
+  const goToNextNav       = useCallback(() => goToNextNavFnRef.current(), []);
+  const handleEscape      = useCallback(() => handleEscapeFnRef.current(), []);
+  const toggleTranslation = useCallback(() => toggleTranslationFnRef.current(), []);
+  const toggleShiftHint   = useCallback(() => toggleShiftHintFnRef.current(), []);
   const setVoiceMode = useCallback((active: boolean) => { voiceModeRef.current = active; }, []);
   const saveVoiceResult = useCallback((accuracy: number, mistypeCount: number) => saveVoiceResultFnRef.current(accuracy, mistypeCount), []);
 
-  return { display, startGame, startGameWithCategory, cleanup, toggleAudio, goToNextContent, setVoiceMode, saveVoiceResult };
+  return {
+    display,
+    startGame,
+    startGameWithCategory,
+    cleanup,
+    toggleAudio,
+    goToNextContent,
+    goToPrevContent,
+    goToNextNav,
+    handleEscape,
+    toggleTranslation,
+    toggleShiftHint,
+    setVoiceMode,
+    saveVoiceResult,
+  };
 }
