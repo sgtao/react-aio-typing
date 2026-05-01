@@ -84,12 +84,6 @@ h1 {
 
 /* ---- text areas ---- */
 
-.instruction {
-  font-size: 16px;
-  font-weight: bold;
-  color: red;
-}
-
 .esc-warning {
   font-size: 13px;
   color: #cc3030;
@@ -818,6 +812,8 @@ h1 {
 
 .action-buttons {
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.75rem;

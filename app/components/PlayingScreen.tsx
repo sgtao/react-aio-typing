@@ -242,16 +242,10 @@ export function PlayingScreen({
 
   return (
     <>
-      <p className="instruction">
-        {mode === 'composition'
-          ? 'Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)／Shift=全文表示／←→=前後移動'
-          : 'Enter=音声再生・停止／Tab=訳切替／Esc=リセット(未入力でメニュー)／←→=前後移動'}
-      </p>
-
+      <span className="translate-label">
+        {translationMode === 'slashed' ? 'スラッシュ訳' : '自然な訳'}（Tab=訳切替）：
+      </span>
       <p className="hint-text">
-        <span className="translate-label">
-          {translationMode === 'slashed' ? 'スラッシュ訳' : '自然な訳'}：
-        </span>
         {translateText}
       </p>
 
