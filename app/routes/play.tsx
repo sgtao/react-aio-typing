@@ -8,7 +8,19 @@ import { SectionHeader } from '../components/SectionHeader';
 import { useSpeechInput } from '../hooks/useSpeechInput';
 
 export default function Play() {
-  const { display, cleanup, toggleAudio, goToNextContent, setVoiceMode, saveVoiceResult } = useGameContext();
+  const {
+    display,
+    cleanup,
+    toggleAudio,
+    goToNextContent,
+    goToPrevContent,
+    goToNextNav,
+    handleEscape,
+    toggleTranslation,
+    toggleShiftHint,
+    setVoiceMode,
+    saveVoiceResult,
+  } = useGameContext();
   const navigate = useNavigate();
 
   const {
@@ -67,7 +79,19 @@ export default function Play() {
   };
 
   const content = (() => {
-    if (display.phase === 'playing') return <PlayingScreen display={display} toggleAudio={toggleAudio} voice={voiceProps} />;
+    if (display.phase === 'playing')
+      return (
+        <PlayingScreen
+          display={display}
+          toggleAudio={toggleAudio}
+          voice={voiceProps}
+          onPrev={goToPrevContent}
+          onNext={goToNextNav}
+          onEsc={handleEscape}
+          onTab={toggleTranslation}
+          onShiftToggle={toggleShiftHint}
+        />
+      );
     if (display.phase === 'result') return <ResultScreen display={display} />;
     return null;
   })();

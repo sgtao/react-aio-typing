@@ -25,6 +25,11 @@ interface Props {
   display: GameDisplay;
   toggleAudio: () => void;
   voice: VoiceProps;
+  onPrev: () => void;
+  onNext: () => void;
+  onEsc: () => void;
+  onTab: () => void;
+  onShiftToggle: () => void;
 }
 
 function TypingDisplay({ display }: { display: GameDisplay }) {
@@ -49,6 +54,45 @@ function TypingDisplay({ display }: { display: GameDisplay }) {
         return <span key={i} className="char-pending">{displayChar}</span>;
       })}
     </p>
+  );
+}
+
+function NavBar({ onPrev, onNext }: { onPrev: () => void; onNext: () => void }) {
+  return (
+    <div className="nav-bar">
+      <button className="nav-btn" onClick={onPrev}>← 前へ</button>
+      <button className="nav-btn" onClick={onNext}>次へ →</button>
+    </div>
+  );
+}
+
+interface ActionButtonsProps {
+  mode: 'typing' | 'composition';
+  translationMode: 'slashed' | 'natural';
+  shiftHintActive: boolean;
+  onEsc: () => void;
+  onTab: () => void;
+  onShiftToggle: () => void;
+}
+
+function ActionButtons({
+  mode, translationMode, shiftHintActive, onEsc, onTab, onShiftToggle,
+}: ActionButtonsProps) {
+  return (
+    <div className="action-buttons">
+      <button className="action-btn" onClick={onEsc}>Esc</button>
+      <button className="action-btn" onClick={onTab}>
+        {translationMode === 'slashed' ? '自然な訳へ' : 'スラッシュ訳へ'}
+      </button>
+      {mode === 'composition' && (
+        <button
+          className={`action-btn${shiftHintActive ? ' action-btn--active' : ''}`}
+          onClick={onShiftToggle}
+        >
+          {shiftHintActive ? '元に戻す' : '全文表示'}
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -186,7 +230,9 @@ function VoicePanel({ voice, displayProps }: { voice: VoiceProps; displayProps: 
   );
 }
 
-export function PlayingScreen({ display, toggleAudio, voice }: Props) {
+export function PlayingScreen({
+  display, toggleAudio, voice, onPrev, onNext, onEsc, onTab, onShiftToggle,
+}: Props) {
   const {
     hintText, targetText, translateText, translationMode,
     escWarning, mode, shiftHintActive, wpm, accuracy, elapsed, isAudioPlaying, hasAudio,
@@ -215,6 +261,8 @@ export function PlayingScreen({ display, toggleAudio, voice }: Props) {
         <p className="esc-warning">もう一度 ESC を押すとメニューに戻ります</p>
       )}
 
+      <NavBar onPrev={onPrev} onNext={onNext} />
+
       <TypingDisplay display={display} />
 
       <LiveStats wpm={wpm} accuracy={accuracy} elapsed={elapsed} />
@@ -225,6 +273,15 @@ export function PlayingScreen({ display, toggleAudio, voice }: Props) {
           {isAudioPlaying ? 'Stop ( Enter )' : 'Start ( Enter )'}
         </button>
       )}
+
+      <ActionButtons
+        mode={mode}
+        translationMode={translationMode}
+        shiftHintActive={shiftHintActive}
+        onEsc={onEsc}
+        onTab={onTab}
+        onShiftToggle={onShiftToggle}
+      />
 
       {mode === 'composition' && (
         <VoicePanel
