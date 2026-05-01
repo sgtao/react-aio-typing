@@ -59,9 +59,9 @@ function TypingDisplay({ display }: { display: GameDisplay }) {
 
 function NavBar({ onPrev, onNext }: { onPrev: () => void; onNext: () => void }) {
   return (
-    <div className="nav-bar">
-      <button className="nav-btn" onClick={onPrev}>← 前へ</button>
-      <button className="nav-btn" onClick={onNext}>次へ →</button>
+    <div className="play-nav-bar">
+      <button className="play-nav-btn" onClick={onPrev}>← 前へ</button>
+      <button className="play-nav-btn" onClick={onNext}>次へ →</button>
     </div>
   );
 }
