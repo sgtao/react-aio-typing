@@ -692,6 +692,48 @@ h1 {
   background: #c2e8fa;
 }
 
+/* ---- export / import panel ---- */
+
+.export-import-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.5rem 0 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.export-btn,
+.import-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.export-btn:hover,
+.import-btn:hover {
+  /* background-color: #e2e8f0; */
+  background-color: #e8f0ff;
+  border-color: #3060cc;
+  color: #3060cc;
+}
+
+.import-message {
+  font-size: 0.85rem;
+  color: #2a9d2a;
+  margin: 0;
+}
+
+.import-message--error {
+  color: #cc3030;
+}
+
 /* -- reset button -- */
 
 .history-reset-btn {
