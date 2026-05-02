@@ -112,14 +112,26 @@ describe('getWeakMap', () => {
 // ---------------------------------------------------------------------------
 
 describe('recordMistypes', () => {
-  it('count が 0 のとき何も保存しない', () => {
+  it('count が 0 かつ既存エントリなし → 何も変化しない', () => {
     historyStorage.recordMistypes(1, 0);
     expect(historyStorage.getWeakMap()).toEqual({});
   });
 
-  it('count が負のとき何も保存しない', () => {
+  it('count が 0 かつ既存エントリあり → エントリを削除する', () => {
+    historyStorage.recordMistypes(1, 3);
+    historyStorage.recordMistypes(1, 0);
+    expect(historyStorage.getWeakMap()[1]).toBeUndefined();
+  });
+
+  it('count が負かつ既存エントリなし → 何も変化しない', () => {
     historyStorage.recordMistypes(1, -1);
     expect(historyStorage.getWeakMap()).toEqual({});
+  });
+
+  it('count が負かつ既存エントリあり → エントリを削除する', () => {
+    historyStorage.recordMistypes(1, 3);
+    historyStorage.recordMistypes(1, -1);
+    expect(historyStorage.getWeakMap()[1]).toBeUndefined();
   });
 
   it('新規 no に count=3 を記録する', () => {
@@ -127,10 +139,10 @@ describe('recordMistypes', () => {
     expect(historyStorage.getWeakMap()[1].mistypeCount).toBe(3);
   });
 
-  it('既存 no に追加で count=2 を記録すると累積される', () => {
+  it('既存 no に count=2 を記録すると count=2 に上書きされる（累積しない）', () => {
     historyStorage.recordMistypes(1, 3);
     historyStorage.recordMistypes(1, 2);
-    expect(historyStorage.getWeakMap()[1].mistypeCount).toBe(5);
+    expect(historyStorage.getWeakMap()[1].mistypeCount).toBe(2);
   });
 });
 

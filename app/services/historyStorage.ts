@@ -44,10 +44,15 @@ function getWeakMap(): WeakMap {
 }
 
 function recordMistypes(no: number, count: number): void {
-  if (count <= 0) return;
   const map = getWeakMap();
-  if (!map[no]) map[no] = { mistypeCount: 0 };
-  map[no].mistypeCount += count;
+  if (count <= 0) {
+    if (map[no]) {
+      delete map[no];
+      localStorage.setItem(WEAK_KEY, JSON.stringify(map));
+    }
+    return;
+  }
+  map[no] = { mistypeCount: count };
   localStorage.setItem(WEAK_KEY, JSON.stringify(map));
 }
 
