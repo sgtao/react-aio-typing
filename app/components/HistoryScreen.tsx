@@ -1,5 +1,5 @@
 // app/components/HistoryScreen.tsx
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { historyStorage } from '../services/historyStorage';
 import type { SessionRecord } from '../services/historyStorage';
 import { csvLoader } from '../services/csvLoader';
@@ -150,6 +150,69 @@ function WeakTab({ sessions }: { sessions: SessionRecord[] }) {
   );
 }
 
+function ExportImportPanel({ onImportDone }: { onImportDone: () => void }) {
+  const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleExport() {
+    const json = historyStorage.exportAll();
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `aio-history-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target!.result as string;
+      try {
+        let count = 0;
+        try {
+          const parsed = JSON.parse(text) as { sessions?: unknown[] };
+          count = Array.isArray(parsed.sessions) ? parsed.sessions.length : 0;
+        } catch { /* leave count as 0 */ }
+        historyStorage.importAll(text);
+        setMessage({ text: `インポートしました（セッション ${count} 件）`, isError: false });
+        onImportDone();
+      } catch (err) {
+        setMessage({
+          text: `インポートに失敗しました: ${err instanceof Error ? err.message : String(err)}`,
+          isError: true,
+        });
+      }
+      setTimeout(() => setMessage(null), 3000);
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  return (
+    <div className="export-import-panel">
+      <button className="export-btn" onClick={handleExport}>エクスポート</button>
+      <button className="import-btn" onClick={() => fileInputRef.current?.click()}>インポート</button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: 'none' }}
+        onChange={handleImport}
+      />
+      {message && (
+        <p className={`import-message${message.isError ? ' import-message--error' : ''}`}>
+          {message.text}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function ResetDialog({
   title,
   body,
@@ -228,35 +291,48 @@ export function HistoryScreen() {
         {(
           [
             {
-              tab: 'category' as Tab,
-              modifier: 'challenge',
-              label: '挑戦数',
-              value: <>{attemptedAll}<span className="summary-stat-total"> / {totalAll}</span></>,
+              tab: "category" as Tab,
+              modifier: "challenge",
+              label: "挑戦数",
+              value: (
+                <>
+                  {attemptedAll}
+                  <span className="summary-stat-total"> / {totalAll}</span>
+                </>
+              ),
               sub: null,
             },
             {
-              tab: 'sessions' as Tab,
-              modifier: 'complete',
-              label: 'セクション完了',
-              value: <>{completedCategories}<span className="summary-stat-total"> / {totalCategories}</span></>,
+              tab: "sessions" as Tab,
+              modifier: "complete",
+              label: "セクション完了",
+              value: (
+                <>
+                  {completedCategories}
+                  <span className="summary-stat-total">
+                    {" "}
+                    / {totalCategories}
+                  </span>
+                </>
+              ),
               sub: null,
             },
             {
-              tab: 'weak' as Tab,
-              modifier: 'stats',
-              label: '正確率 / 平均 WPM',
-              value: avgAccuracy !== null ? `${avgAccuracy}%` : '—',
-              sub: avgWpm !== null ? `${avgWpm} WPM` : '—',
+              tab: "weak" as Tab,
+              modifier: "stats",
+              label: "正確率 / 平均 WPM",
+              value: avgAccuracy !== null ? `${avgAccuracy}%` : "—",
+              sub: avgWpm !== null ? `${avgWpm} WPM` : "—",
             },
           ] as const
         ).map(({ tab, modifier, label, value, sub }) => (
           <div
             key={tab}
-            className={`summary-stat-card summary-stat-card--${modifier}${activeTab === tab ? ' summary-stat-card--active' : ''}`}
+            className={`summary-stat-card summary-stat-card--${modifier}${activeTab === tab ? " summary-stat-card--active" : ""}`}
             role="button"
             tabIndex={0}
             onClick={() => handleCardClick(tab)}
-            onKeyDown={(e) => e.key === 'Enter' && handleCardClick(tab)}
+            onKeyDown={(e) => e.key === "Enter" && handleCardClick(tab)}
           >
             <div className="summary-stat-label">{label}</div>
             <div className="summary-stat-value">{value}</div>
@@ -267,25 +343,32 @@ export function HistoryScreen() {
 
       {activeTab !== null && (
         <div className="history-content" key={resetKey}>
-          {activeTab === 'category' && (
+          {activeTab === "category" && (
             <CategoryTab
               onCategoryResetRequest={(cat) => setCategoryToReset(cat)}
               onCategoryStart={startGameWithCategory}
             />
           )}
-          {activeTab === 'sessions' && <SessionsTab sessions={sessions} />}
-          {activeTab === 'weak' && <WeakTab sessions={sessions} />}
+          {activeTab === "sessions" && <SessionsTab sessions={sessions} />}
+          {activeTab === "weak" && <WeakTab sessions={sessions} />}
         </div>
       )}
 
-      <button className="history-reset-btn" onClick={() => setShowResetDialog(true)}>
+      <ExportImportPanel onImportDone={() => setResetKey((k) => k + 1)} />
+
+      <button
+        className="history-reset-btn"
+        onClick={() => setShowResetDialog(true)}
+      >
         全履歴をリセット
       </button>
 
       {showResetDialog && (
         <ResetDialog
           title="学習履歴を全てリセット"
-          body={"セッション履歴と苦手な文を全て削除します。\nこの操作は元に戻せません。"}
+          body={
+            "セッション履歴と苦手な文を全て削除します。\nこの操作は元に戻せません。"
+          }
           onCancel={() => setShowResetDialog(false)}
           onConfirm={handleReset}
         />
