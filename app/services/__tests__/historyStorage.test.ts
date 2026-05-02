@@ -205,3 +205,117 @@ describe('clearByCategory', () => {
     expect(historyStorage.getWeakMap()).toEqual({});
   });
 });
+
+// ---------------------------------------------------------------------------
+// exportAll
+// ---------------------------------------------------------------------------
+
+describe('exportAll', () => {
+  it('空の localStorage では version=1・sessions=[]・weak={} の JSON を返す', () => {
+    const data = JSON.parse(historyStorage.exportAll());
+    expect(data.version).toBe(1);
+    expect(data.sessions).toEqual([]);
+    expect(data.weak).toEqual({});
+    expect(typeof data.exportedAt).toBe('number');
+  });
+
+  it('保存済みの sessions と weak が含まれる', () => {
+    historyStorage.saveSession(session);
+    historyStorage.recordMistypes(1, 3);
+    const data = JSON.parse(historyStorage.exportAll());
+    expect(data.sessions).toHaveLength(1);
+    expect(data.sessions[0]).toEqual(session);
+    expect(data.weak['1'].mistypeCount).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// importAll
+// ---------------------------------------------------------------------------
+
+describe('importAll', () => {
+  it('sessions が既存と結合される', () => {
+    historyStorage.saveSession({ ...session, no: 1, timestamp: 1000 });
+    const importJson = JSON.stringify({
+      version: 1,
+      exportedAt: Date.now(),
+      sessions: [{ ...session, no: 2, timestamp: 2000 }],
+      weak: {},
+    });
+    historyStorage.importAll(importJson);
+    const sessions = historyStorage.getSessions();
+    expect(sessions).toHaveLength(2);
+    expect(sessions.some((s) => s.no === 1)).toBe(true);
+    expect(sessions.some((s) => s.no === 2)).toBe(true);
+  });
+
+  it('マージ後は timestamp 降順で最大 200 件に切り詰められる', () => {
+    for (let i = 0; i < 150; i++) {
+      historyStorage.saveSession({ ...session, no: i, timestamp: i });
+    }
+    const importSessions = Array.from({ length: 100 }, (_, i) => ({
+      ...session, no: i + 200, timestamp: i + 200,
+    }));
+    historyStorage.importAll(
+      JSON.stringify({ version: 1, exportedAt: Date.now(), sessions: importSessions, weak: {} })
+    );
+    expect(historyStorage.getSessions()).toHaveLength(200);
+  });
+
+  it('weak: 同じ no はインポート値で上書きされる', () => {
+    historyStorage.recordMistypes(1, 3);
+    historyStorage.importAll(
+      JSON.stringify({ version: 1, exportedAt: Date.now(), sessions: [], weak: { 1: { mistypeCount: 7 } } })
+    );
+    expect(historyStorage.getWeakMap()[1].mistypeCount).toBe(7);
+  });
+
+  it('weak: インポートにない no は既存が保持される', () => {
+    historyStorage.recordMistypes(1, 3);
+    historyStorage.recordMistypes(2, 5);
+    historyStorage.importAll(
+      JSON.stringify({ version: 1, exportedAt: Date.now(), sessions: [], weak: { 1: { mistypeCount: 7 } } })
+    );
+    expect(historyStorage.getWeakMap()[2].mistypeCount).toBe(5);
+  });
+
+  it('version が 1 以外のとき Error をスローする', () => {
+    expect(() =>
+      historyStorage.importAll(JSON.stringify({ version: 2, sessions: [], weak: {} }))
+    ).toThrow();
+  });
+
+  it('sessions が配列でないとき Error をスローする', () => {
+    expect(() =>
+      historyStorage.importAll(JSON.stringify({ version: 1, sessions: 'not-array', weak: {} }))
+    ).toThrow();
+  });
+
+  it('weak がオブジェクトでないとき Error をスローする', () => {
+    expect(() =>
+      historyStorage.importAll(JSON.stringify({ version: 1, sessions: [], weak: null }))
+    ).toThrow();
+  });
+
+  it('不正な JSON 文字列のとき Error をスローする', () => {
+    expect(() => historyStorage.importAll('not-json')).toThrow();
+  });
+
+  it('不正な SessionRecord はスキップされ有効なレコードは取り込まれる', () => {
+    const importJson = JSON.stringify({
+      version: 1,
+      exportedAt: Date.now(),
+      sessions: [
+        { ...session, no: 1, timestamp: 1000 },
+        { no: 'bad', category: 'x', index: 'y', mode: 'typing', timestamp: 2000 },
+        { ...session, no: 3, timestamp: 3000 },
+      ],
+      weak: {},
+    });
+    historyStorage.importAll(importJson);
+    const sessions = historyStorage.getSessions();
+    expect(sessions).toHaveLength(2);
+    expect(sessions.some((s) => s.no === 1)).toBe(true);
+    expect(sessions.some((s) => s.no === 3)).toBe(true);
+  });
+});
