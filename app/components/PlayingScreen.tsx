@@ -261,12 +261,21 @@ export function PlayingScreen({
 
       <LiveStats wpm={wpm} accuracy={accuracy} elapsed={elapsed} />
 
-      {hasAudio && (
-        <button className="audio-btn" onClick={toggleAudio}>
-          <span className="audio-icon">{isAudioPlaying ? '⏸' : '▶'}</span>
-          {isAudioPlaying ? 'Stop ( Enter )' : 'Start ( Enter )'}
-        </button>
-      )}
+      <div className="action-buttons">
+        {hasAudio && (
+          <button className="audio-btn" onClick={toggleAudio}>
+            <span className="audio-icon">{isAudioPlaying ? '⏸' : '▶'}</span>
+            {isAudioPlaying ? 'Stop ( Enter )' : 'Start ( Enter )'}
+          </button>
+        )}
+        {mode === 'composition' && (
+          <VoicePanel
+            voice={voice}
+            displayProps={{ translateText, translationMode, displayedHint }}
+          />
+        )}
+      </div>
+
 
       <ActionButtons
         mode={mode}
@@ -277,12 +286,6 @@ export function PlayingScreen({
         onShiftToggle={onShiftToggle}
       />
 
-      {mode === 'composition' && (
-        <VoicePanel
-          voice={voice}
-          displayProps={{ translateText, translationMode, displayedHint }}
-        />
-      )}
     </>
   );
 }
