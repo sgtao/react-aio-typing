@@ -78,6 +78,3 @@
 
 - 旧バージョン（静的HTML版）: [sgtao/aio-typing](https://github.com/sgtao/aio-typing)（[demo](https://sgtao.github.io/aio-typing/index.html)）
 
-## LICENSE
-
-MIT LICENSE
