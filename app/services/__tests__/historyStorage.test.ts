@@ -318,4 +318,18 @@ describe('importAll', () => {
     expect(sessions.some((s) => s.no === 1)).toBe(true);
     expect(sessions.some((s) => s.no === 3)).toBe(true);
   });
+
+  it('weak の値が不正なエントリはスキップされる', () => {
+    const importJson = JSON.stringify({
+      version: 1,
+      exportedAt: Date.now(),
+      sessions: [],
+      weak: { '1': { mistypeCount: 3 }, '2': null, '3': 42 },
+    });
+    historyStorage.importAll(importJson);
+    const map = historyStorage.getWeakMap();
+    expect(map[1]).toEqual({ mistypeCount: 3 });
+    expect(map[2]).toBeUndefined();
+    expect(map[3]).toBeUndefined();
+  });
 });

@@ -28,6 +28,7 @@ function isExportData(data: unknown): data is ExportData {
   const d = data as Record<string, unknown>;
   return (
     d.version === 1 &&
+    typeof d.exportedAt === 'number' &&
     Array.isArray(d.sessions) &&
     typeof d.weak === 'object' &&
     d.weak !== null
@@ -125,7 +126,9 @@ function importAll(json: string): void {
 
   const weakMap = getWeakMap();
   for (const [key, val] of Object.entries(data.weak)) {
-    weakMap[Number(key)] = val as { mistypeCount: number };
+    if (typeof val === 'object' && val !== null && typeof (val as Record<string, unknown>).mistypeCount === 'number') {
+      weakMap[Number(key)] = val as { mistypeCount: number };
+    }
   }
   localStorage.setItem(WEAK_KEY, JSON.stringify(weakMap));
 }
