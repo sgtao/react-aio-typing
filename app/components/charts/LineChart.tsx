@@ -14,12 +14,13 @@ export function LineChart({ data }: LineChartProps) {
   const W = 120;
   const H = 48;
   const PADDING_LEFT = 0;
+  const PADDING_RIGHT = 4;
   const PADDING_TOP = 4;
   const PADDING_BOTTOM = 4;
   const chartH = H - PADDING_TOP - PADDING_BOTTOM;
 
   // accuracy は 0〜100 のスケール
-  const xStep = (W - PADDING_LEFT) / (data.length - 1);
+  const xStep = (W - PADDING_LEFT - PADDING_RIGHT) / (data.length - 1);
   const toX = (i: number) => PADDING_LEFT + i * xStep;
   const toY = (v: number) => PADDING_TOP + chartH - (v / 100) * chartH;
 
@@ -28,7 +29,7 @@ export function LineChart({ data }: LineChartProps) {
   const lastY = toY(data[data.length - 1]);
   const firstX = toX(0);
   const firstY = toY(data[0]);
-  const areaPoints = `${firstX},${firstY} ${points} ${lastX},${H - PADDING_BOTTOM} ${firstX},${H - PADDING_BOTTOM}`;
+  const areaPoints = `${points} ${lastX},${H - PADDING_BOTTOM} ${firstX},${H - PADDING_BOTTOM}`;
 
   // グリッド線 Y 位置（25 / 50 / 75%）
   const gridYs = [75, 50, 25].map((v) => toY(v));
