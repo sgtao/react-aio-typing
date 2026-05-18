@@ -11,7 +11,7 @@ export function DonutChart({ value, total }: DonutChartProps) {
   const gap = circumference - filled;
 
   return (
-    <svg width="100" height="100" viewBox="0 0 100 100" role="img" aria-label={`${pct}% (${value}/${total})`}>
+    <svg style={{ width: '78%', height: 'auto', display: 'block', margin: '8px auto 0' }} viewBox="0 0 100 100" role="img" aria-label={`${pct}% (${value}/${total})`}>
       <circle
         cx="50" cy="50" r={radius}
         fill="none"
