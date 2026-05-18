@@ -304,11 +304,11 @@ export function HistoryScreen() {
       <div className="category-summary-stats">
         {/* 挑戦数カード */}
         <div
-          className={`summary-stat-card summary-stat-card--challenge${activeTab === "category" ? " summary-stat-card--active" : ""}`}
+          className={`summary-stat-card summary-stat-card--challenge${activeTab === "sessions" ? " summary-stat-card--active" : ""}`}
           role="button"
           tabIndex={0}
-          onClick={() => handleCardClick("category")}
-          onKeyDown={(e) => e.key === "Enter" && handleCardClick("category")}
+          onClick={() => handleCardClick("sessions")}
+          onKeyDown={(e) => e.key === "Enter" && handleCardClick("sessions")}
         >
           <div className="summary-stat-label">挑戦数</div>
           <div className="summary-stat-value">
@@ -320,11 +320,11 @@ export function HistoryScreen() {
 
         {/* セクション完了カード */}
         <div
-          className={`summary-stat-card summary-stat-card--complete${activeTab === "sessions" ? " summary-stat-card--active" : ""}`}
+          className={`summary-stat-card summary-stat-card--complete${activeTab === "category" ? " summary-stat-card--active" : ""}`}
           role="button"
           tabIndex={0}
-          onClick={() => handleCardClick("sessions")}
-          onKeyDown={(e) => e.key === "Enter" && handleCardClick("sessions")}
+          onClick={() => handleCardClick("category")}
+          onKeyDown={(e) => e.key === "Enter" && handleCardClick("category")}
         >
           <div className="summary-stat-label">セクション完了</div>
           <div className="summary-stat-value">
