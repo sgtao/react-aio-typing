@@ -5,6 +5,9 @@ import type { SessionRecord } from '../services/historyStorage';
 import { csvLoader } from '../services/csvLoader';
 import type { Sentence } from '../services/csvLoader';
 import { useGameContext } from '../context/GameContext';
+import { DonutChart } from './charts/DonutChart';
+import { HorizontalBarChart } from './charts/HorizontalBarChart';
+import { LineChart } from './charts/LineChart';
 
 type Tab = 'category' | 'sessions' | 'weak';
 
@@ -266,6 +269,17 @@ export function HistoryScreen() {
     ? Math.round(sessions.reduce((sum, s) => sum + s.accuracy, 0) / sessions.length)
     : null;
 
+  const barItems = categories.map((cat) => {
+    const catSentences = csvLoader.getByCategory(cat);
+    return {
+      label: cat,
+      value: catSentences.filter((s) => attemptedNos.has(s.no)).length,
+      total: catSentences.length,
+    };
+  });
+
+  const accuracyData = sessions.slice(0, 30).reverse().map((s) => s.accuracy);
+
   function handleCardClick(t: Tab) {
     setActiveTab((prev) => (prev === t ? null : t));
   }
@@ -288,57 +302,53 @@ export function HistoryScreen() {
       <h2 className="history-title">学習履歴</h2>
 
       <div className="category-summary-stats">
-        {(
-          [
-            {
-              tab: "category" as Tab,
-              modifier: "challenge",
-              label: "挑戦数",
-              value: (
-                <>
-                  {attemptedAll}
-                  <span className="summary-stat-total"> / {totalAll}</span>
-                </>
-              ),
-              sub: null,
-            },
-            {
-              tab: "sessions" as Tab,
-              modifier: "complete",
-              label: "セクション完了",
-              value: (
-                <>
-                  {completedCategories}
-                  <span className="summary-stat-total">
-                    {" "}
-                    / {totalCategories}
-                  </span>
-                </>
-              ),
-              sub: null,
-            },
-            {
-              tab: "weak" as Tab,
-              modifier: "stats",
-              label: "正確率 / 平均 WPM",
-              value: avgAccuracy !== null ? `${avgAccuracy}%` : "—",
-              sub: avgWpm !== null ? `${avgWpm} WPM` : "—",
-            },
-          ] as const
-        ).map(({ tab, modifier, label, value, sub }) => (
-          <div
-            key={tab}
-            className={`summary-stat-card summary-stat-card--${modifier}${activeTab === tab ? " summary-stat-card--active" : ""}`}
-            role="button"
-            tabIndex={0}
-            onClick={() => handleCardClick(tab)}
-            onKeyDown={(e) => e.key === "Enter" && handleCardClick(tab)}
-          >
-            <div className="summary-stat-label">{label}</div>
-            <div className="summary-stat-value">{value}</div>
-            {sub !== null && <div className="summary-stat-sub">{sub}</div>}
+        {/* 挑戦数カード */}
+        <div
+          className={`summary-stat-card summary-stat-card--challenge${activeTab === "category" ? " summary-stat-card--active" : ""}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick("category")}
+          onKeyDown={(e) => e.key === "Enter" && handleCardClick("category")}
+        >
+          <div className="summary-stat-label">挑戦数</div>
+          <div className="summary-stat-value">
+            {attemptedAll}
+            <span className="summary-stat-total"> / {totalAll}</span>
           </div>
-        ))}
+          <DonutChart value={attemptedAll} total={totalAll} />
+        </div>
+
+        {/* セクション完了カード */}
+        <div
+          className={`summary-stat-card summary-stat-card--complete${activeTab === "sessions" ? " summary-stat-card--active" : ""}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick("sessions")}
+          onKeyDown={(e) => e.key === "Enter" && handleCardClick("sessions")}
+        >
+          <div className="summary-stat-label">セクション完了</div>
+          <div className="summary-stat-value">
+            {completedCategories}
+            <span className="summary-stat-total"> / {totalCategories}</span>
+          </div>
+          <HorizontalBarChart items={barItems} />
+        </div>
+
+        {/* 正確率カード */}
+        <div
+          className={`summary-stat-card summary-stat-card--stats${activeTab === "weak" ? " summary-stat-card--active" : ""}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => handleCardClick("weak")}
+          onKeyDown={(e) => e.key === "Enter" && handleCardClick("weak")}
+        >
+          <div className="summary-stat-label">正確率 / 平均 WPM</div>
+          <div className="summary-stat-value">
+            {avgAccuracy !== null ? `${avgAccuracy}%` : "—"}
+          </div>
+          {avgWpm !== null && <div className="summary-stat-sub">{avgWpm} WPM</div>}
+          <LineChart data={accuracyData} />
+        </div>
       </div>
 
       {activeTab !== null && (
