@@ -27,4 +27,18 @@ describe('HorizontalBarChart', () => {
     render(<HorizontalBarChart items={[]} />);
     // no error
   });
+
+  it('6件以上渡したとき5件しか表示しない', () => {
+    const manyItems = [
+      { label: 'A', value: 1, total: 10 },
+      { label: 'B', value: 2, total: 10 },
+      { label: 'C', value: 3, total: 10 },
+      { label: 'D', value: 4, total: 10 },
+      { label: 'E', value: 5, total: 10 },
+      { label: 'F', value: 6, total: 10 },
+    ];
+    render(<HorizontalBarChart items={manyItems} />);
+    expect(screen.queryByText('F')).not.toBeInTheDocument();
+    expect(screen.getByText('E')).toBeInTheDocument();
+  });
 });

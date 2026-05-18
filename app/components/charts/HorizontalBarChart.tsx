@@ -12,11 +12,11 @@ export function HorizontalBarChart({ items }: HorizontalBarChartProps) {
   const visibleItems = items.slice(0, 5);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '10px' }}>
-      {visibleItems.map((item) => {
+      {visibleItems.map((item, i) => {
         const pct = item.total > 0 ? Math.round((item.value / item.total) * 100) : 0;
         const dim = pct === 0;
         return (
-          <div key={item.label}>
+          <div key={`${item.label}-${i}`} role="meter" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={item.label}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
               <span style={{ fontSize: '8px', opacity: dim ? 0.55 : 0.9 }}>{item.label}</span>
               <span style={{ fontSize: '8px', opacity: dim ? 0.55 : 0.9 }}>{pct}%</span>
